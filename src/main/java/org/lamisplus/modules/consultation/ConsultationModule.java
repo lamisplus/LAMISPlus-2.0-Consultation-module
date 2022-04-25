@@ -24,7 +24,7 @@ import java.util.List;
         })
 public class ConsultationModule extends AcrossModule
 {
-    public final static String NAME = "consultationModule";
+    public final static String NAME = "ConsultationModule";
 
     public ConsultationModule(){
         super();
