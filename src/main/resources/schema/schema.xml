@@ -7,7 +7,7 @@
     <changeSet id="20220424173405-0002" author="kennedy">
         <preConditions onFail="HALT">
             <sqlCheck expectedResult="0">
-                SELECT count(*) FROM information_schema.tables WHERE table_name = 'consultation_encounter';
+                SELECT count(*) FROM information_schema.tables WHERE table_name = 'consultation';
             </sqlCheck>
         </preConditions>
         <sqlFile dbms="postgresql"

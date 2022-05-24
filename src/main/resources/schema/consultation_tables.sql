@@ -1,16 +1,23 @@
 --consultation_encounter
-CREATE SEQUENCE consultation_encounter_id_seq;
-CREATE TABLE public.consultation_encounter
+CREATE SEQUENCE consultation_id_seq;
+CREATE TABLE public.consultation
 (
-    id bigint NOT NULL DEFAULT nextval('consultation_encounter_id_seq'),
+    id bigint NOT NULL DEFAULT nextval('consultation_id_seq'),
     uuid character varying(100),
+	visit_id INTEGER,
+	encounter_id INTEGER,
     patient_id integer,
 	encounter_date date,
 	visit_notes character varying(3000),
+	
+	created_by character varying(200),
+	date_created TIMESTAMP,
+	modified_by character varying(200),
+	date_modified TIMESTAMP,
     PRIMARY KEY (id)
 );
-ALTER TABLE IF EXISTS public.consultation_encounter OWNER to postgres;	
-ALTER SEQUENCE consultation_encounter_id_seq OWNED BY consultation_encounter.id;
+ALTER TABLE IF EXISTS public.consultation OWNER to postgres;	
+ALTER SEQUENCE consultation_id_seq OWNED BY consultation.id;
 
 
 --consultation_complaint
@@ -19,12 +26,16 @@ CREATE TABLE public.consultation_complaint
 (
     id bigint NOT NULL DEFAULT nextval('consultation_complaint_id_seq'),
     uuid character varying(100),
-    complaint character varying(300),
+    complaint character varying(3000),
 	onset_date date, 
-	visit_notes character varying(3000),
 	severity integer,
 	date_resolved date,
-	encounter_id integer,
+	consultation_id integer,
+	
+	created_by character varying(200),
+	date_created TIMESTAMP,
+	modified_by character varying(200),
+	date_modified TIMESTAMP,
     PRIMARY KEY (id)
 );
 ALTER TABLE IF EXISTS public.consultation_complaint OWNER to postgres;	
@@ -37,10 +48,15 @@ CREATE TABLE public.consultation_diagnosis
 (
     id bigint NOT NULL DEFAULT nextval('consultation_diagnosis_id_seq'),
     uuid character varying(100),
-    diagnosis character varying(300),
+    diagnosis character varying(3000),
 	diagnosis_order integer,
 	certainty integer,
-	encounter_id integer,
+	consultation_id integer,
+	
+	created_by character varying(200),
+	date_created TIMESTAMP,
+	modified_by character varying(200),
+	date_modified TIMESTAMP,
     PRIMARY KEY (id)
 );
 ALTER TABLE IF EXISTS public.consultation_diagnosis OWNER to postgres;	

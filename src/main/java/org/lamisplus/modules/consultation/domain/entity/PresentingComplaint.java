@@ -1,18 +1,15 @@
 package org.lamisplus.modules.consultation.domain.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
+@Table(name = "consultation_complaint")
 public class PresentingComplaint extends Audit<String> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

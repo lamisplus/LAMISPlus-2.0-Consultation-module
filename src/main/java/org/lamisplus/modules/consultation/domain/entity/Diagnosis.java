@@ -15,8 +15,8 @@ public class Diagnosis extends Audit<String> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private int id;
-    @Column(name = "condition")
-    private String condition;
+    @Column(name = "diagnosis")
+    private String diagnosis;
     @Column(name = "diagnosis_order")
     private int diagnosisOrder;
     @Column(name = "certainty")
