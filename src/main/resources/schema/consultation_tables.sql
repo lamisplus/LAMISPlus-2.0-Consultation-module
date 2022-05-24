@@ -5,7 +5,7 @@ CREATE TABLE public.consultation_encounter
     id bigint NOT NULL DEFAULT nextval('consultation_encounter_id_seq'),
     uuid character varying(100),
     patient_id integer,
-	encounter date, 
+	encounter_date date,
 	visit_notes character varying(3000),
     PRIMARY KEY (id)
 );
@@ -46,9 +46,9 @@ CREATE TABLE public.consultation_diagnosis
 ALTER TABLE IF EXISTS public.consultation_diagnosis OWNER to postgres;	
 ALTER SEQUENCE consultation_diagnosis_id_seq OWNED BY consultation_diagnosis.id;
 
-
-SELECT setval('application_codeset_id_seq1', (SELECT MAX(id) FROM application_codeset)+1);
-
+delete from application_codeset where codeset_group='COMPLAINT_SEVERITY';
+delete from application_codeset where codeset_group='DIAGNOSIS_ORDER';
+delete from application_codeset where codeset_group='DIAGNOSIS_CERTAINTY';
 insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '1', 'en', 1, gen_random_uuid(), '2022-04-25', '');
 insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '2', 'en', 1, gen_random_uuid(), '2022-04-25', '');
 insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '3', 'en', 1, gen_random_uuid(), '2022-04-25', '');

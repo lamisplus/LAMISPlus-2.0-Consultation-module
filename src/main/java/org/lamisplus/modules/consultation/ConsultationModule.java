@@ -5,6 +5,7 @@ import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.context.configurer.ComponentScanConfigurer;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.web.AcrossWebModule;
+import org.springframework.boot.SpringApplication;
 import org.springframework.context.annotation.Bean;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -26,6 +27,10 @@ public class ConsultationModule extends AcrossModule
 {
     public final static String NAME = "ConsultationModule";
 
+    public static void main(String[] args) {
+        SpringApplication.run (ConsultationModule.class, args);
+    }
+
     public ConsultationModule(){
         super();
         addApplicationContextConfigurer(new ComponentScanConfigurer(
@@ -33,9 +38,9 @@ public class ConsultationModule extends AcrossModule
                 getClass().getPackage().getName() +".service",
                 getClass().getPackage().getName() +".config",
                 getClass().getPackage().getName() +".domain",
-                getClass().getPackage().getName() +".domain.mapper",
+                getClass().getPackage().getName() +".extensions",
+                getClass().getPackage().getName() +".installers",
                 getClass().getPackage().getName() +".utility",
-                getClass().getPackage().getName() +".component",
                 getClass().getPackage().getName() +".repository"));
     }
     @Override

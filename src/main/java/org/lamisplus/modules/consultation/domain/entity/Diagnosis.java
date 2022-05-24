@@ -1,26 +1,24 @@
 package org.lamisplus.modules.consultation.domain.entity;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Diagnosis {
+@Data
+@Table(name = "consultation_diagnosis")
+public class Diagnosis extends Audit<String> {
     @Id
-    @GeneratedValue
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private int id;
+    @Column(name = "condition")
     private String condition;
-    private int diagnosis_order;
+    @Column(name = "diagnosis_order")
+    private int diagnosisOrder;
+    @Column(name = "certainty")
     private int certainty;
 }

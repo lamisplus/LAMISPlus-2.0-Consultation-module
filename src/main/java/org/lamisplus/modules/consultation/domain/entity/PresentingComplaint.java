@@ -5,9 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -15,13 +13,17 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PresentingComplaint {
+public class PresentingComplaint extends Audit<String> {
     @Id
-    @GeneratedValue
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private int id;
+    @Column(name = "complaint")
     private String complaint;
-    private LocalDate onset_date;
+    @Column(name = "onset_date")
+    private LocalDate onsetDate;
+    @Column(name = "severity")
     private int severity;
-    private LocalDate date_resolved;
+    @Column(name = "date_resolved")
+    private LocalDate dateResolved;
 }

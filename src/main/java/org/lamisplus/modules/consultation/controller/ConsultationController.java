@@ -2,8 +2,8 @@ package org.lamisplus.modules.consultation.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.lamisplus.modules.consultation.domain.entity.ConsultationEncounter;
-import org.lamisplus.modules.consultation.service.ConsultationEncounterService;
+import org.lamisplus.modules.consultation.domain.entity.Consultation;
+import org.lamisplus.modules.consultation.service.ConsultationService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,20 +13,20 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("api/consultations")
 public class ConsultationController {
-    private final ConsultationEncounterService service;
+    private final ConsultationService service;
 
     @PostMapping("")
-    public ConsultationEncounter Save(@RequestBody ConsultationEncounter encounter){
+    public Consultation Save(@RequestBody Consultation encounter){
         return service.Save(encounter);
     }
 
     @PutMapping("/{id}")
-    public ConsultationEncounter Update(@PathVariable int id, @RequestBody ConsultationEncounter encounter){
+    public Consultation Update(@PathVariable int id, @RequestBody Consultation encounter){
         return service.Update(id, encounter);
     }
 
     @GetMapping("/{patient_id}")
-    public List<ConsultationEncounter> GetConsultationsByPatientId(@PathVariable int patient_id){
+    public List<Consultation> GetConsultationsByPatientId(@PathVariable int patient_id){
         return service.GetAllEncountersByPatientId(patient_id);
     }
 
