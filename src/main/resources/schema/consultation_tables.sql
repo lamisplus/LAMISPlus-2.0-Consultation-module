@@ -62,22 +62,24 @@ CREATE TABLE public.consultation_diagnosis
 ALTER TABLE IF EXISTS public.consultation_diagnosis OWNER to postgres;	
 ALTER SEQUENCE consultation_diagnosis_id_seq OWNED BY consultation_diagnosis.id;
 
+SELECT setval('application_codeset_id_seq1', (SELECT MAX(id) FROM application_codeset)+1);
+
 delete from application_codeset where codeset_group='COMPLAINT_SEVERITY';
 delete from application_codeset where codeset_group='DIAGNOSIS_ORDER';
 delete from application_codeset where codeset_group='DIAGNOSIS_CERTAINTY';
-insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '1', 'en', 1, gen_random_uuid(), '2022-04-25', '');
-insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '2', 'en', 1, gen_random_uuid(), '2022-04-25', '');
-insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '3', 'en', 1, gen_random_uuid(), '2022-04-25', '');
-insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '4', 'en', 1, gen_random_uuid(), '2022-04-25', '');
-insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '5', 'en', 1, gen_random_uuid(), '2022-04-25', '');
-insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '6', 'en', 1, gen_random_uuid(), '2022-04-25', '');
-insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '7', 'en', 1, gen_random_uuid(), '2022-04-25', '');
-insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '8', 'en', 1, gen_random_uuid(), '2022-04-25', '');
-insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '9', 'en', 1, gen_random_uuid(), '2022-04-25', '');
-insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '10', 'en', 1, gen_random_uuid(), '2022-04-25', '');
+insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '1', 'en', 1, '', '2022-04-25', '');
+insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '2', 'en', 1, '', '2022-04-25', '');
+insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '3', 'en', 1, '', '2022-04-25', '');
+insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '4', 'en', 1, '', '2022-04-25', '');
+insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '5', 'en', 1, '', '2022-04-25', '');
+insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '6', 'en', 1, '', '2022-04-25', '');
+insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '7', 'en', 1, '', '2022-04-25', '');
+insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '8', 'en', 1, '', '2022-04-25', '');
+insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '9', 'en', 1, '', '2022-04-25', '');
+insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('COMPLAINT_SEVERITY', '10', 'en', 1, '', '2022-04-25', '');
 
-insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('DIAGNOSIS_ORDER', 'Primary', 'en', 1, gen_random_uuid(), '2022-04-25', '');
-insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('DIAGNOSIS_ORDER', 'Secondary', 'en', 1, gen_random_uuid(), '2022-04-25', '');
+insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('DIAGNOSIS_ORDER', 'Primary', 'en', 1, '', '2022-04-25', '');
+insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('DIAGNOSIS_ORDER', 'Secondary', 'en', 1, '', '2022-04-25', '');
 
-insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('DIAGNOSIS_CERTAINTY', 'Presumed', 'en', 1, gen_random_uuid(), '2022-04-25', '');
-insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('DIAGNOSIS_CERTAINTY', 'Confirmed', 'en', 1, gen_random_uuid(), '2022-04-25', '');
+insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('DIAGNOSIS_CERTAINTY', 'Presumed', 'en', 1, '', '2022-04-25', '');
+insert into application_codeset(codeset_group, display, language, version, code, date_created, created_by) values('DIAGNOSIS_CERTAINTY', 'Confirmed', 'en', 1, '', '2022-04-25', '');
