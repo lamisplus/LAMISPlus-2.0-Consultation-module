@@ -201,7 +201,7 @@ const Patients = (props) => {
                                             pathname: "/patient-history",
                                             state: { patientObj: row  }
                                         }}>
-                                    <MdDashboard size="15" color="black" />{" "}<span style={{color: '#000'}}>Patient Details</span>                   
+                                    <MdDashboard size="15" color="black" />{" "}<span style={{color: '#000'}}>Patient Dashboard</span>                   
                                     </Link>
                                 </MenuItem>                                    
     

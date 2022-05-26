@@ -9,7 +9,6 @@ import CardContent from '@mui/material/CardContent';
 import PatientCardDetail from './PatientCard'
 import { useHistory } from "react-router-dom";
 import {   Tab, Tabs, } from "react-bootstrap";
-import SubMenu from './SubMenu';
 import RecentHistory from './../History/RecentHistory';
 
 

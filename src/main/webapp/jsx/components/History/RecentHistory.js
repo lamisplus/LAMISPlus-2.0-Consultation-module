@@ -12,153 +12,16 @@ const Widget = () => {
           <Grid.Column>
             <Segment>
                 <Label as='a' color='blue' ribbon>
-                  Vital
+                  Recent Vitals
                 </Label>
-                  <span>Recent Vitals</span>
                   <br/>
-                  <List>
-                  <List.Item><Button
-                      color='red'
-                      size='mini'
-                      content='BloodType'
-                      style={{height: '25px' }}
-                      //icon='heart'
-                      label={{ basic: true, color: 'red', pointing: 'left', content: 'AB+' }}
-                    /></List.Item>
-                  <List.Item><Button
-                        basic
-                        color='blue'
-                        content='Height'
-                        size='mini'
-                        icon='fork'
-                        style={{height: '25px' }}
-                        label={{
-                            as: 'a',
-                            basic: true,
-                            color: 'blue',
-                            pointing: 'left',
-                            content: '74.5 in',
-                        }}
-                      /> </List.Item>
-                  <List.Item>
-                    <Button
-                        basic
-                        color='blue'
-                        size='mini'
-                        content='Weight'
-                        style={{height: '25px' }}
-                        icon='fork'
-                        label={{
-                            as: 'a',
-                            basic: true,
-                            color: 'blue',
-                            pointing: 'left',
-                            content: '74.5 in',
-                        }}
-                        />
-                  </List.Item>
-                  <List.Item>
-                    <Button
-                        basic
-                        color='blue'
-                        size='mini'
-                        style={{height: '25px' }}
-                        content='Weight'
-                        icon='fork'
-                        label={{
-                            as: 'a',
-                            basic: true,
-                            color: 'blue',
-                            pointing: 'left',
-                            content: '74.5 in',
-                        }}
-                        />
-                  </List.Item>
-                  <List.Item>
-                    <Button
-                        basic
-                        color='blue'
-                        size='mini'
-                        style={{height: '25px' }}
-                        content='Temperature'
-                        icon='fork'
-                        label={{
-                            as: 'a',
-                            basic: true,
-                            color: 'blue',
-                            pointing: 'left',
-                            content: '74.5 in',
-                        }}
-                        />
-                  </List.Item>
-                  <List.Item>
-                    <Button
-                        basic
-                        style={{height: '25px' }}
-                        color='blue'
-                        size='mini'
-                        content='Pulse'
-                        icon='fork'
-                        label={{
-                            as: 'a',
-                            basic: true,
-                            color: 'blue',
-                            pointing: 'left',
-                            content: '74.5 in',
-                        }}
-                        />
-                  </List.Item>
-                  <List.Item>
-                    <Button
-                        basic
-                        color='blue'
-                        size='mini'
-                        style={{height: '25px' }}
-                        content='Respiratory Rate'
-                        icon='fork'
-                        label={{
-                            as: 'a',
-                            basic: true,
-                            color: 'blue',
-                            pointing: 'left',
-                            content: '74.5 in',
-                        }}
-                        />
-                  </List.Item>
-                  <List.Item>
-                    <Button
-                        basic
-                        color='red'
-                        size='mini'
-                        style={{height: '25px' }}
-                        content='Blood Presure'
-                        icon='fork'
-                        label={{
-                            as: 'a',
-                            basic: true,
-                            color: 'red',
-                            pointing: 'left',
-                            content: '74.5 in',
-                        }}
-                        />
-                  </List.Item>
-                  <List.Item>
-                    <Button
-                        basic
-                        color='red'
-                        size='mini'
-                        style={{height: '25px' }}
-                        content='Arterial Blood Oxyl'
-                        icon='fork'
-                        label={{
-                            as: 'a',
-                            basic: true,
-                            color: 'red',
-                            pointing: 'left',
-                            content: '74.5 in',
-                        }}
-                        />
-                  </List.Item>
+                  <List celled >
+                <List.Item>Pulse <span className="float-end"><b>45mpb</b></span></List.Item>
+                <List.Item>Respiratory Rate <span className="float-end"><b>41mpb</b></span></List.Item>
+                <List.Item>Temperature <span className="float-end"><b>32<sub>0</sub>C</b></span></List.Item>
+                <List.Item>Blood Presure <span  className="float-end"><b>332/30</b></span></List.Item>
+                <List.Item>Height <span  className="float-end"><b>31.89m</b></span></List.Item>
+                <List.Item>Weight <span  className="float-end"><b>376kg</b></span></List.Item>
                 </List>
 
             </Segment>
@@ -168,13 +31,13 @@ const Widget = () => {
                   Conditions
                 </Label>
                 <br/>
-                <Label as='a'  color='grey' pointing>
+                <Label as='a'  color='white'  size="mini" pointing>
                   Laser Fever
                 </Label>
-                <Label as='a'  color='grey' pointing>
+                <Label as='a'  color='white'  size="mini" pointing>
                   Typoid Fever
                 </Label>
-                <Label as='a'  color='grey' pointing>
+                <Label as='a'  color='white'  size="mini" pointing>
                  Asthma
                 </Label>
 
@@ -185,17 +48,10 @@ const Widget = () => {
                 </Label>
                   <br/><br/>
                   <Label.Group color='blue'>
-                    <Label as='a'>
-                      Malaria
-                      <Icon name='close' />
-                    </Label>
-                    <Label as='a'>
-                      cold
-                     
-                    </Label>
-                    <Label as='a'>dust</Label>
-                    <Label as='a'>smoke</Label>
-                    <Label as='a'>water</Label>
+                  
+                    <Label as='a'  size="mini">dust</Label>
+                    <Label as='a'  size="mini">smoke</Label>
+
                   </Label.Group>
 
             </Segment>
@@ -390,31 +246,19 @@ const Widget = () => {
             <Card.Content>
               <Feed>
                 <Feed.Event>
-                  <Feed.Label image='/images/avatar/small/jenny.jpg' />
                   <Feed.Content>
-                    <Feed.Date content='1 day ago' />
+                    <Feed.Date content='20-03-2022' />
                     <Feed.Summary>
-                      You added <a>Jenny Hess</a> to your <a>coworker</a> group.
+                      The malaria is plus 3 and and need more attention
                     </Feed.Summary>
                   </Feed.Content>
                 </Feed.Event>
-
+                <hr/>
                 <Feed.Event>
-                  <Feed.Label image='/images/avatar/small/molly.png' />
                   <Feed.Content>
-                    <Feed.Date content='3 days ago' />
+                    <Feed.Date content='20-05-2022' />
                     <Feed.Summary>
-                      You added <a>Molly Malone</a> as a friend.
-                    </Feed.Summary>
-                  </Feed.Content>
-                </Feed.Event>
-
-                <Feed.Event>
-                  <Feed.Label image='/images/avatar/small/elliot.jpg' />
-                  <Feed.Content>
-                    <Feed.Date content='4 days ago' />
-                    <Feed.Summary>
-                      You added <a>Elliot Baker</a> to your <a>musicians</a> group.
+                      Blood presure is too high
                     </Feed.Summary>
                   </Feed.Content>
                 </Feed.Event>

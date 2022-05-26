@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import classNames from 'classnames';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -16,8 +15,6 @@ import { Col, Row } from "reactstrap";
 import Moment from "moment";
 import momentLocalizer from "react-widgets-moment";
 import moment from "moment";
-import Enrollment from './../Enrollment/EnrollmentForm';
-import ArtCommencement from './../ArtCommencement/ArtCommencement';
 import axios from "axios";
 import { url as baseUrl } from "./../../../api";
 import { token as token } from "./../../../api";
