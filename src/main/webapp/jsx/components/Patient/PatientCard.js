@@ -1,27 +1,20 @@
 import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import classNames from 'classnames';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelActions from '@material-ui/core/ExpansionPanelActions';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-//import Chip from '@material-ui/core/Chip';
 import Divider from '@material-ui/core/Divider';
 import { Button } from 'semantic-ui-react';
 import {Label,} from "semantic-ui-react";
 import 'semantic-ui-css/semantic.min.css';
 import { Col, Row } from "reactstrap";
 import Moment from "moment";
-import momentLocalizer from "react-widgets-moment";
 import moment from "moment";
-import axios from "axios";
-import { url as baseUrl } from "./../../../api";
-import { token as token } from "./../../../api";
-
-//Dtate Picker package
-Moment.locale("en");
-momentLocalizer();
+import PostPatient from './PostPatient'
 
 const styles = theme => ({
   root: {
@@ -63,24 +56,9 @@ function PatientCard(props) {
   const patientObjs = props.patientObj ? props.patientObj : {}
   const [patientObj, setpatientObj] = useState(patientObjs)
   const [modal, setModal] = useState(false);
-  const [hivStatus, setHivStatus] = useState();
+  const toggle = () => setModal(!modal);
 
-  useEffect(() => {
-    PatientCurrentStatus()
-  }, []);
-    ///GET LIST OF Patients
-    async function PatientCurrentStatus() {
-        axios
-            .get(`${baseUrl}hiv/status/patient-current/${patientObj.bioData.id}`,
-            { headers: {"Authorization" : `Bearer ${token}`} }
-            )
-            .then((response) => {
 
-              setHivStatus(response.data);
-            })
-            .catch((error) => {    
-            });        
-    }
     const calculate_age = dob => {
       var today = new Date();
       var dateParts = dob.split("-");
@@ -97,9 +75,10 @@ function PatientCard(props) {
               return age_now + " year(s)";
     };
 
+  
   const CurrentStatus = ()=>{
 
-        return (  <Label color="green" size="mini">Active</Label>);
+        return (  <Label color="blue" size="mini">Active</Label>);
 }
 const getHospitalNumber = (identifier) => {     
   const identifiers = identifier;
@@ -117,6 +96,10 @@ const getAddress = (identifier) => {
   return address ? address.city : '';
 };
 
+const PostPatientService =(row)=> {
+  setpatientObj({...patientObj, ...row});
+  setModal(!modal)
+}
 
   
   return (
@@ -130,45 +113,45 @@ const getAddress = (identifier) => {
                     <Row className={"mt-1"}>
                     <Col md={12} className={classes.root2}>
                         <b style={{fontSize: "25px"}}>
-                        {patientObj.bioData.firstName + " " + patientObj.bioData.surname }
+                        {patientObj.firstName + " " + patientObj.surname }
                         </b>
                         
                     </Col>
                     <Col md={4} className={classes.root2}>
                     <span>
                         {" "}
-                        Patient ID : <b>{getHospitalNumber(patientObj.bioData.identifier) }</b>
+                        Patient ID : <b>{getHospitalNumber(patientObj.identifier) }</b>
                     </span>
                     </Col>
 
                     <Col md={4} className={classes.root2}>
                     <span>
-                        Date Of Birth : <b>{patientObj.bioData.dateOfBirth }</b>
+                        Date Of Birth : <b>{patientObj.dateOfBirth }</b>
                     </span>
                     </Col>
                     <Col md={4} className={classes.root2}>
                     <span>
                         {" "}
-                        Age : <b>{calculate_age(moment(patientObj.bioData.dateOfBirth).format("DD-MM-YYYY"))}</b>
+                        Age : <b>{calculate_age(moment(patientObj.dateOfBirth).format("DD-MM-YYYY"))}</b>
                     </span>
                     </Col>
                     <Col md={4}>
                     <span>
                         {" "}
                         Gender :{" "}
-                        <b>{patientObj.bioData.gender.display }</b>
+                        <b>{patientObj.gender.display }</b>
                     </span>
                     </Col>
                     <Col md={4} className={classes.root2}>
                     <span>
                         {" "}
-                        Phone Number : <b>{getPhoneNumber(patientObj.bioData.contactPoint)}</b>
+                        Phone Number : <b>{getPhoneNumber(patientObj.contactPoint)}</b>
                     </span>
                     </Col>
                     <Col md={4} className={classes.root2}>
                     <span>
                         {" "}
-                        Address : <b>{getAddress(patientObj.bioData.address)} </b>
+                        Address : <b>{getAddress(patientObj.address)} </b>
                     </span>
                     </Col>
 
@@ -178,21 +161,61 @@ const getAddress = (identifier) => {
                         {" "}
                         <b>Status : </b> {CurrentStatus()}
                       </span>
+                      
                     </Col>
                     </Row>
                     </Col>
+                    <div className="float-end">
+                      {" "}<Button secondary floated='right'  onClick={() => PostPatientService(patientObj)}>Post Patient</Button>
+                    </div>
                 </Row>
             
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails className={classes.details}>
+                
+                    <Button
+                      color='red'
+                      content='Blood Presure'
+                      //icon='heart'
+                      label={{ basic: true, color: 'red', pointing: 'left', content: '11/22' }}
+                    />
                                   
+                    <Button
+                        basic
+                        color='blue'
+                        content='Height'
+                        icon='fork'
+                        label={{
+                            as: 'a',
+                            basic: true,
+                            color: 'blue',
+                            pointing: 'left',
+                            content: '74.5 in',
+                        }}
+                      />              
+                      <Button
+                        basic
+                        color='blue'
+                        content='Weight'
+                        icon='fork'
+                        label={{
+                            as: 'a',
+                            basic: true,
+                            color: 'blue',
+                            pointing: 'left',
+                            content: '74.5 in',
+                        }}
+                        />
+                               
+                 
                 </ExpansionPanelDetails>
                 <Divider />
                 <ExpansionPanelActions expandIcon={<ExpandMoreIcon />}>
                 
                 </ExpansionPanelActions>
             </ExpansionPanel>
-   </div>
+            <PostPatient toggle={toggle} showModal={modal} patientObj={patientObj} />
+    </div>
   );
 }
 
