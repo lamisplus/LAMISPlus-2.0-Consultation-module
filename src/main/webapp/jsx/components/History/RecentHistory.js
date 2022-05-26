@@ -68,6 +68,13 @@ const Widget = () => {
                <input type="date" className="form-control" />
              </div>
               <br/>
+              <div className="input-group input-group-sm mb-3">
+                 
+                 <span className="input-group-text">Visit Note</span>
+              
+                 <textarea className="form-control"></textarea>
+             </div>
+             <br/>
               <Label as='a' color='red' ribbon>
                 Presenting Complaints
               </Label>
