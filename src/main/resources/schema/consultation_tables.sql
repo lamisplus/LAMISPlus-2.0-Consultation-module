@@ -62,8 +62,6 @@ CREATE TABLE public.consultation_diagnosis
 ALTER TABLE IF EXISTS public.consultation_diagnosis OWNER to postgres;	
 ALTER SEQUENCE consultation_diagnosis_id_seq OWNED BY consultation_diagnosis.id;
 
-SELECT setval('application_codeset_id_seq1', (SELECT MAX(id) FROM application_codeset)+1);
-
 delete from application_codeset where codeset_group='COMPLAINT_SEVERITY';
 delete from application_codeset where codeset_group='DIAGNOSIS_ORDER';
 delete from application_codeset where codeset_group='DIAGNOSIS_CERTAINTY';
