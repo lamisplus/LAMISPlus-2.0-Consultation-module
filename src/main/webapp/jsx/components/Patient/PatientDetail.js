@@ -60,6 +60,18 @@ function PatientCard(props) {
         <CardContent>
             <PatientCardDetail patientObj={patientObj}/>
             <br/>
+            <Link to={"/"} >
+            <ButtonMui
+                variant="contained"
+                color="primary"
+                className=" float-end ms-2"
+                //startIcon={<FaUserPlus size="10"/>}
+
+            >
+                <span style={{ textTransform: "capitalize" }}>Back</span>
+            </ButtonMui>
+            </Link> 
+            <br/>    
             <RecentHistory />
                
          </CardContent>
