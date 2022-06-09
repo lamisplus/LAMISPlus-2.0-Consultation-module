@@ -22,6 +22,11 @@ public class ConsultationService {
         return repository.save(consultation);
     }
 
+    public Consultation findById(int id)
+    {
+        return repository.findById(id).orElse(null);
+    }
+
     public List<Consultation> GetAllEncountersByPatientId(int patientId) {
         return repository.findAllByPatientId(patientId);
     }

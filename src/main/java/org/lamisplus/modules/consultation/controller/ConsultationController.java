@@ -25,7 +25,12 @@ public class ConsultationController {
         return service.Update(id, encounter);
     }
 
-    @GetMapping("/{patient_id}")
+    @GetMapping("/{id}")
+    public Consultation Load(@PathVariable int id){
+        return service.findById(id);
+    }
+
+    @GetMapping("/consultations-by-patient-id/{patient_id}")
     public List<Consultation> GetConsultationsByPatientId(@PathVariable int patient_id){
         return service.GetAllEncountersByPatientId(patient_id);
     }
