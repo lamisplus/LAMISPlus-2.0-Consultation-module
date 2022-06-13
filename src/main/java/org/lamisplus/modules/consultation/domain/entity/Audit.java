@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.lamisplus.modules.base.security.SecurityUtils;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -26,7 +27,7 @@ public class Audit<U>
     @Column(name = "created_by", nullable = false, updatable = false)
     @JsonIgnore
     @ToString.Exclude
-    private String createdBy = ""; //SecurityUtils.getCurrentUserLogin().orElse("");
+    private String createdBy = SecurityUtils.getCurrentUserLogin().orElse("");
 
     @CreatedDate
     @Column(name = "date_created", nullable = false, updatable = false)
@@ -38,7 +39,7 @@ public class Audit<U>
     @Column(name = "modified_by")
     @JsonIgnore
     @ToString.Exclude
-    private String modifiedBy = ""; //SecurityUtils.getCurrentUserLogin().orElse("");
+    private String modifiedBy = SecurityUtils.getCurrentUserLogin().orElse("");
 
     @LastModifiedDate
     @Column(name = "date_modified")
