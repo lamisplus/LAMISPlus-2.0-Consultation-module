@@ -107,7 +107,7 @@ const Patients = (props) => {
     ///GET LIST OF Patients
     async function patients() {
         axios
-            .get(`${baseUrl}patient/checked-in-by-service/consultation-code`,
+            .get(`${baseUrl}patient/checked-in-by-service/triage-code`,
                 { headers: {"Authorization" : `Bearer ${token}`} }
             )
             .then((response) => {
