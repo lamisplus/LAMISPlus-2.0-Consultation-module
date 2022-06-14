@@ -12,7 +12,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/consultations")
+@RequestMapping("api/v1/consultations")
 public class ConsultationController {
     private final ConsultationService service;
 

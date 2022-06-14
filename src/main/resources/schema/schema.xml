@@ -16,5 +16,17 @@
                  splitStatements="false"
                  stripComments="true"/>
     </changeSet>
+    <changeSet id="20220614173405-0003" author="kennedy">
+        <preConditions onFail="HALT">
+            <sqlCheck expectedResult="0">
+                select count(*) from permission where description like '%Consultation%'
+            </sqlCheck>
+        </preConditions>
+        <sqlFile dbms="postgresql"
+                 path="consultation_permission_list.sql"
+                 relativeToChangelogFile="true"
+                 splitStatements="false"
+                 stripComments="true"/>
+    </changeSet>
 </databaseChangeLog>
 
