@@ -27,9 +27,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { MdDashboard } from "react-icons/md";
 import {Menu,MenuList,MenuButton,MenuItem,} from "@reach/menu-button";
 import "@reach/menu-button/styles.css";
-import { Label } from 'semantic-ui-react'
 import moment from "moment";
-
 
 
 const tableIcons = {
@@ -98,8 +96,7 @@ const useStyles = makeStyles(theme => ({
 
 const Patients = (props) => {
 
-    const [patientList, setPatientList] = useState([])
-    const [patientObj, setpatientObj] = useState([])
+    const [patientList, setPatientList] = useState([]);
 
     useEffect(() => {
         patients()
@@ -107,14 +104,14 @@ const Patients = (props) => {
     ///GET LIST OF Patients
     async function patients() {
         axios
-            .get(`${baseUrl}patient/checked-in-by-service/triage-code`,
+            .get(`${baseUrl}patient/checked-in-by-service/consultation-code`,
                 { headers: {"Authorization" : `Bearer ${token}`} }
             )
             .then((response) => {
-
                 setPatientList(response.data);
             })
             .catch((error) => {
+                console.log(error);
             });
     }
     const calculate_age = dob => {

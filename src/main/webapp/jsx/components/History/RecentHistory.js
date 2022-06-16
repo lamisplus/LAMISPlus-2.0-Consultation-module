@@ -1,4 +1,4 @@
-import React, {Fragment, useState} from "react";
+import React, {Fragment, useState, useCallback, useEffect } from "react";
 import { KeyboardDateTimePicker, MuiPickersUtilsProvider, KeyboardDatePicker } from "@material-ui/pickers";
 import { useForm, Controller } from "react-hook-form";
 import DateFnsUtils from '@date-io/date-fns';
@@ -8,9 +8,15 @@ import {token, url as baseUrl} from "../../../api";
 import { Grid, Segment, Label, Icon, List,Button, Card, Feed, Input, Radio } from 'semantic-ui-react';
 // Page titie
 import {  Checkbox, Table } from 'semantic-ui-react';
+import {format} from "date-fns";
 
 
-const Widget = () => {
+const Widget = (props) => {
+    const patientObj = props.patientObj ? props.patientObj : {}
+    const [isLabEnabled, setIsLabEnabled] = useState(false);
+    const [isPharmacyEnabled, setIsPharmacyEnabled] = useState(false);
+    const [latestVitals, setLatestVitals] = useState([]);
+    const [dosageUnits, setDosageUnits] = useState([]);
     const [encounterDate, setEncounterDate] = useState(new Date());
     const { handleSubmit, control, getValues, setError, setValue } = useForm();
     const [inputFields, setInputFields] = useState([
@@ -24,16 +30,14 @@ const Widget = () => {
         try {
             const InData = {
                 "diagnosisList": inputFieldsDiagnosis,
-                "encounterDate": data.encounterDate,
-                "encounterId": 1,
+                "encounterDate": format(new Date(data.encounterDate.toString()), 'yyyy-MM-dd'),
                 "id": 0,
-                "patientId": 1,
+                "patientId": patientObj.id,
                 "presentingComplaints": inputFields,
-                "uuid": "string",
-                "visitId": 1,
+                "visitId": patientObj.visitId,
                 "visitNotes": data.visitNote
             }
-            await axios.post(`${baseUrl}consultations`, InData, { headers: {"Authorization" : `Bearer ${token}`} });
+            await axios.post(`http://localhost:8282/api/consultations`, InData, { headers: {"Authorization" : `Bearer ${token}`} });
             toast.success("Successfully Saved Consultation !", {
                 position: toast.POSITION.TOP_RIGHT
             });
@@ -46,6 +50,64 @@ const Widget = () => {
     const OnError = (errors) => {
         console.error(errors);
     };
+
+    const loadLabCheck = useCallback(async () => {
+        try {
+            const response = await axios.get(`${baseUrl}modules/check?moduleName=lab`, { headers: {"Authorization" : `Bearer ${token}`} });
+            setIsLabEnabled(response.data);
+        } catch (e) {
+            toast.error("An error occurred while fetching lab", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+        }
+    }, []);
+
+    const loadPharmacyCheck = useCallback(async () => {
+        try {
+            const response = await axios.get(`${baseUrl}modules/check?moduleName=pharmacy`, { headers: {"Authorization" : `Bearer ${token}`} });
+            setIsPharmacyEnabled(response.data);
+        } catch (e) {
+            toast.error("An error occurred while fetching pharmacy", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+        }
+    }, []);
+
+    const loadLatestVitals = useCallback(async () => {
+        try {
+            const response = await axios.get(`${baseUrl}patient/vital-sign/person/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`}});
+            setLatestVitals(response.data);
+        } catch (e) {
+            toast.error("An error occurred while fetching vitals", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+        }
+    }, []);
+
+    const loadDosageUnits = useCallback(async () => {
+        try {
+            const response = await axios.get(`${baseUrl}application-codesets/v2/DOSE_STRENGTH_UNIT`, { headers: {"Authorization" : `Bearer ${token}`}});
+            setDosageUnits(response.data);
+        } catch (e) {
+            toast.error("An error occurred while fetching DOSE STRENGTH UNIT", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+        }
+    }, []);
+
+    useEffect(() => {
+        loadPharmacyCheck();
+        loadLabCheck();
+        loadLatestVitals();
+        loadDosageUnits();
+    }, [loadPharmacyCheck, loadLabCheck, loadLatestVitals, loadDosageUnits]);
+
+    let dosageUnitsRows = null;
+    if (dosageUnits && dosageUnits.length > 0) {
+        dosageUnitsRows = dosageUnits.map((dosageUnit, index) => (
+            <option key={dosageUnit.id} value={dosageUnit.id}>{dosageUnit.display}</option>
+        ));
+    }
 
     const handleAddFields = () => {
         const values = [...inputFields];
@@ -75,7 +137,6 @@ const Widget = () => {
     };
 
     const handleInputDiagChange = (index, event) => {
-        console.log(event.target.value);
         const values = [...inputFieldsDiagnosis];
         if (event.target.name === "diagnosis") {
             values[index].diagnosis = event.target.value;
@@ -91,20 +152,22 @@ const Widget = () => {
     return (
         <Grid columns='equal'>
             <Grid.Column>
-                <Segment>
-                    <Label as='a' color='blue' ribbon>
-                        Recent Vitals
-                    </Label>
-                    <br/>
-                    <List celled >
-                        <List.Item>Pulse <span className="float-end"><b>45mpb</b></span></List.Item>
-                        <List.Item>Respiratory Rate <span className="float-end"><b>41mpb</b></span></List.Item>
-                        <List.Item>Temperature <span className="float-end"><b>32<sub>0</sub>C</b></span></List.Item>
-                        <List.Item>Blood Presure <span  className="float-end"><b>332/30</b></span></List.Item>
-                        <List.Item>Height <span  className="float-end"><b>31.89m</b></span></List.Item>
-                        <List.Item>Weight <span  className="float-end"><b>376kg</b></span></List.Item>
-                    </List>
-                </Segment>
+                { latestVitals && latestVitals.length > 0 &&
+                    <Segment>
+                        <Label as='a' color='blue' ribbon>
+                            Recent Vitals
+                        </Label>
+                        <br/>
+                        <List celled >
+                            <List.Item>Pulse <span className="float-end"><b>{latestVitals[latestVitals.length - 1].pulse}mpb</b></span></List.Item>
+                            <List.Item>Respiratory Rate <span className="float-end"><b>{latestVitals[latestVitals.length - 1].respiratoryRate}mpb</b></span></List.Item>
+                            <List.Item>Temperature <span className="float-end"><b>{latestVitals[latestVitals.length - 1].temperature}<sup>0</sup>C</b></span></List.Item>
+                            <List.Item>Blood Presure <span  className="float-end"><b>{latestVitals[latestVitals.length - 1].systolic}/{latestVitals[latestVitals.length - 1].diastolic}</b></span></List.Item>
+                            <List.Item>Height <span  className="float-end"><b>{latestVitals[latestVitals.length - 1].height}m</b></span></List.Item>
+                            <List.Item>Weight <span  className="float-end"><b>{latestVitals[latestVitals.length - 1].bodyWeight}kg</b></span></List.Item>
+                        </List>
+                    </Segment>
+                }
 
                 <Segment>
                     <Label as='a' color='black' ribbon>
@@ -328,81 +391,137 @@ const Widget = () => {
                             </Table.Footer>
                         </Table>
                         <br/>
-                        <Label as='a' color='teal' ribbon>
-                            Lab Test
-                        </Label>
-                        <Table color="teal" celled>
-                            <Table.Header>
-                                <Table.Row>
-                                    <Table.HeaderCell>Lab Test Date</Table.HeaderCell>
-                                    <Table.HeaderCell>Lab	Order</Table.HeaderCell>
-                                    <Table.HeaderCell>Lab Test</Table.HeaderCell>
-                                    <Table.HeaderCell>Piriority</Table.HeaderCell>
-                                    <Table.HeaderCell>Order By</Table.HeaderCell>
-                                </Table.Row>
-                            </Table.Header>
+                        { isLabEnabled && <div>
+                            <Label as='a' color='teal' ribbon>
+                                Lab Test
+                            </Label>
 
-                            <Table.Body>
-                                <Table.Row>
-                                    <Table.Cell><Input type="text" fluid  placeholder='Encounter Date' /></Table.Cell>
-                                    <Table.Cell><Input type="text" fluid  placeholder='Encounter Date' /></Table.Cell>
-                                    <Table.Cell><Input type="date" fluid  placeholder='Encounter Date' /></Table.Cell>
-                                    <Table.Cell><Input type="date" fluid  placeholder='Encounter Date' /></Table.Cell>
-                                    <Table.Cell></Table.Cell>
-                                </Table.Row>
+                            <Table color="teal" celled>
+                                <Table.Header>
+                                    <Table.Row>
+                                        <Table.HeaderCell>Encounter Date</Table.HeaderCell>
+                                        <Table.HeaderCell>Lab	Order</Table.HeaderCell>
+                                        <Table.HeaderCell>Lab Test</Table.HeaderCell>
+                                        <Table.HeaderCell>Priority</Table.HeaderCell>
+                                        <Table.HeaderCell>Order By</Table.HeaderCell>
+                                    </Table.Row>
+                                </Table.Header>
 
-                            </Table.Body>
+                                <Table.Body>
+                                    <Table.Row>
+                                        <Table.Cell><Input type="date" fluid  placeholder='Encounter Date' /></Table.Cell>
+                                        <Table.Cell><Input type="select" fluid  placeholder='Select Test Order' /></Table.Cell>
+                                        <Table.Cell><Input type="select" fluid  placeholder='Select Test' /></Table.Cell>
+                                        <Table.Cell><Input type="select" fluid  placeholder='Select Priority' /></Table.Cell>
+                                        <Table.Cell><Input type="text" fluid  placeholder='Test Ordered By' /></Table.Cell>
+                                    </Table.Row>
 
-                            <Table.Footer>
-                                <Table.Row>
-                                    <Table.HeaderCell>
+                                </Table.Body>
 
-                                        <Label as='a' color="blue" size="tiny">
-                                            <Icon name='plus' /> Add Test
-                                        </Label>
-                                    </Table.HeaderCell>
+                                <Table.Footer>
+                                    <Table.Row>
+                                        <Table.HeaderCell>
 
-                                </Table.Row>
-                            </Table.Footer>
-                        </Table>
+                                            <Label as='a' color="blue" size="tiny">
+                                                <Icon name='plus' /> Add Test
+                                            </Label>
+                                        </Table.HeaderCell>
+
+                                    </Table.Row>
+                                </Table.Footer>
+                            </Table>
+                        </div>}
+
                         <br/>
-                        <Label as='a' color='purple' ribbon>
-                            Medication Prescription
-                        </Label>
-                        <Table color="purple" celled>
-                            <Table.Header>
-                                <Table.Row>
-                                    <Table.HeaderCell>Lab Test Date</Table.HeaderCell>
-                                    <Table.HeaderCell>Lab	Order</Table.HeaderCell>
-                                    <Table.HeaderCell>Lab Test</Table.HeaderCell>
-                                    <Table.HeaderCell>Piriority</Table.HeaderCell>
-                                    <Table.HeaderCell>Order By</Table.HeaderCell>
-                                </Table.Row>
-                            </Table.Header>
+                        { isPharmacyEnabled &&
+                            <div>
+                                <Label as='a' color='purple' ribbon>
+                                    Medication Prescription
+                                </Label>
 
-                            <Table.Body>
-                                <Table.Row>
-                                    <Table.Cell><Input type="text" fluid  placeholder='Encounter Date' /></Table.Cell>
-                                    <Table.Cell><Input type="text" fluid  placeholder='Encounter Date' /></Table.Cell>
-                                    <Table.Cell><Input type="date" fluid  placeholder='Encounter Date' /></Table.Cell>
-                                    <Table.Cell><Input type="date" fluid  placeholder='Encounter Date' /></Table.Cell>
-                                    <Table.Cell></Table.Cell>
-                                </Table.Row>
+                                <Table color="purple" celled>
+                                    <Table.Header>
+                                        <Table.Row>
+                                            <Table.HeaderCell>Drug</Table.HeaderCell>
+                                            <Table.HeaderCell>Dosage Strength</Table.HeaderCell>
+                                            <Table.HeaderCell>Dosage Unit</Table.HeaderCell>
+                                            <Table.HeaderCell>Dosage Frequency</Table.HeaderCell>
+                                            <Table.HeaderCell>Start Date</Table.HeaderCell>
+                                            <Table.HeaderCell>Duration</Table.HeaderCell>
+                                            <Table.HeaderCell>Duration Unit</Table.HeaderCell>
+                                        </Table.Row>
+                                    </Table.Header>
 
-                            </Table.Body>
+                                    <Table.Body>
+                                        <Table.Row>
+                                            <Table.Cell>
+                                                <select
+                                                    className="ui fluid selection dropdown"
+                                                    name="drug"
+                                                    id="drug">
+                                                    <option value={""}></option>
+                                                </select>
+                                            </Table.Cell>
+                                            <Table.Cell><Input type="text" fluid  placeholder='Dosage Strength' /></Table.Cell>
+                                            <Table.Cell>
+                                                <select
+                                                    className="ui fluid selection dropdown"
+                                                    name="dosageUnit"
+                                                    id="dosageUnit">
+                                                    <option value={""}></option>
+                                                    {dosageUnitsRows}
+                                                </select>
+                                            </Table.Cell>
+                                            <Table.Cell>
+                                                <Input
+                                                name="dosageFrequency"
+                                                id="dosageFrequency"
+                                                type="text"
+                                                fluid
+                                                placeholder='Dosage Frequency' />
+                                            </Table.Cell>
+                                            <Table.Cell>
+                                                <Input
+                                                    name="startDate"
+                                                    id="startDate"
+                                                    type="date"
+                                                    fluid
+                                                    placeholder='Start Date' />
+                                            </Table.Cell>
+                                            <Table.Cell>
+                                                <Input
+                                                    name="duration"
+                                                    id="duration"
+                                                    type="text"
+                                                    fluid
+                                                    placeholder='Duration' />
+                                            </Table.Cell>
+                                            <Table.Cell>
+                                                <select
+                                                    className="ui fluid selection dropdown"
+                                                    name="durationUnit"
+                                                    id="durationUnit">
+                                                    <option value={""}></option>
+                                                </select>
+                                            </Table.Cell>
+                                        </Table.Row>
 
-                            <Table.Footer>
-                                <Table.Row>
-                                    <Table.HeaderCell>
+                                    </Table.Body>
 
-                                        <Label as='a' color="blue" size="tiny">
-                                            <Icon name='plus' /> Add New Drug Order
-                                        </Label>
-                                    </Table.HeaderCell>
+                                    <Table.Footer>
+                                        <Table.Row>
+                                            <Table.HeaderCell>
 
-                                </Table.Row>
-                            </Table.Footer>
-                        </Table>
+                                                <Label as='a' color="blue" size="tiny">
+                                                    <Icon name='plus' /> Add New Drug Order
+                                                </Label>
+                                            </Table.HeaderCell>
+
+                                        </Table.Row>
+                                    </Table.Footer>
+                                </Table>
+                            </div>
+                        }
                     </Segment>
                     <Button type={"submit"} variant="contained" color={"primary"}>Submit</Button>
                 </form>

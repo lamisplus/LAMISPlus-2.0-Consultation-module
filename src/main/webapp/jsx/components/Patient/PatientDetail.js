@@ -54,6 +54,8 @@ function PatientCard(props) {
     const { classes } = props;
     const patientObj = history.location && history.location.state ? history.location.state.patientObj : {}
 
+    console.log(patientObj);
+
   return (
     <div className={classes.root}>
       <Card >
@@ -72,7 +74,7 @@ function PatientCard(props) {
             </ButtonMui>
             </Link> 
             <br/>    
-            <RecentHistory />
+            <RecentHistory patientObj={patientObj} />
                
          </CardContent>
       </Card>

@@ -27,18 +27,13 @@ import Button from "@material-ui/core/Button";
 import {  toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import 'react-widgets/dist/css/react-widgets.css';
-import { makeStyles } from '@material-ui/core/styles'
-//import { useHistory } from "react-router-dom";
-import { FaUserPlus } from "react-icons/fa";
-import {FaSyringe, FaUserEdit, FaShare, FaTrash} from "react-icons/fa";
-import { MdDashboard } from "react-icons/md";
+import { makeStyles } from '@material-ui/core/styles';
+import { FaShare } from "react-icons/fa";
 import {Menu,MenuList,MenuButton,MenuItem,} from "@reach/menu-button";
 import "@reach/menu-button/styles.css";
-import { Label } from 'semantic-ui-react'
 
 import Moment from "moment";
 import momentLocalizer from "react-widgets-moment";
-import moment from "moment";
 
 //Dtate Picker package
 Moment.locale("en");
