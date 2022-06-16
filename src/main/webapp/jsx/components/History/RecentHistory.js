@@ -9,6 +9,7 @@ import { Grid, Segment, Label, Icon, List,Button, Card, Feed, Input, Radio } fro
 // Page titie
 import {  Checkbox, Table } from 'semantic-ui-react';
 import {format} from "date-fns";
+import { Link, useHistory } from 'react-router-dom';
 
 
 const Widget = (props) => {
@@ -27,15 +28,16 @@ const Widget = (props) => {
     const [inputFieldsDiagnosis, setInputFieldsDiagnosis] = useState([
         { certainty: '', diagnosis: '', diagnosisOrder: 0 }
     ]);
+    const history = useHistory();
 
     const onSubmit = async (data) => {
         try {
             const InData = {
-                "diagnosisList": inputFieldsDiagnosis,
+                "diagnosisList": inputFieldsDiagnosis.diagnosis ? inputFieldsDiagnosis : [],
                 "encounterDate": format(new Date(data.encounterDate.toString()), 'yyyy-MM-dd'),
                 "id": 0,
                 "patientId": patientObj.id,
-                "presentingComplaints": inputFields,
+                "presentingComplaints": inputFields.complaint ? inputFields : [],
                 "visitId": patientObj.visitId,
                 "visitNotes": data.visitNote
             }
@@ -43,6 +45,7 @@ const Widget = (props) => {
             toast.success("Successfully Saved Consultation !", {
                 position: toast.POSITION.TOP_RIGHT
             });
+            history.push('/');
         } catch (e) {
             toast.error("An error occured while saving Consultation !", {
                 position: toast.POSITION.TOP_RIGHT
@@ -183,24 +186,25 @@ const Widget = (props) => {
                     </Segment>
                 }
 
-                <Segment>
-                    <Label as='a' color='black' ribbon>
-                        Conditions
-                    </Label>
-                    <br/>
+                { previousConsultation &&
+                    <Segment>
+                        <Label as='a' color='black' ribbon>
+                            Conditions
+                        </Label>
+                        <br/>
 
-                    <Label as='a'  color='white'  size="mini" pointing>
-                        Laser Fever
-                    </Label>
+                        { previousConsultation.map((consultation, i) => (
+                            <div>
+                                {consultation.diagnosisList.map((diagnosis, j)=> (
+                                    <Label as='a'  color='white'  size="mini" pointing>
+                                        {diagnosis.diagnosis}
+                                    </Label>
+                                ))}
+                            </div>
+                        ))}
+                    </Segment>
+                }
 
-                    <Label as='a'  color='white'  size="mini" pointing>
-                      Typoid Fever
-                    </Label>
-
-                    <Label as='a'  color='white'  size="mini" pointing>
-                     Asthma
-                    </Label>
-                </Segment>
 
                 { hasAllergies &&
                     <Segment>
@@ -556,10 +560,16 @@ const Widget = (props) => {
             <Segment>
             <List>
                   <List.Item>
-                  <Button icon labelPosition='right' color='green' fluid>
-                      <Icon name='eye' />
-                        View History
-                    </Button>
+                      <Link
+                          to={{
+                              pathname: "/patient-consultations-history",
+                              state: { patientObj: patientObj  }
+                          }}>
+                          <Button icon labelPosition='right' color='green' fluid>
+                              <Icon name='eye' />
+                              View History
+                          </Button>
+                      </Link>
                   </List.Item>
                   <List.Item>
                   <Button icon labelPosition='right' color='blue' fluid>

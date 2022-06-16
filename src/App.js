@@ -10,10 +10,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import "./main/webapp/vendor/bootstrap-select/dist/css/bootstrap-select.min.css";
 import "./../src/main/webapp/css/style.css";
 
-import Home from './main/webapp/jsx/components/Home'
-import PatientDetail from './main/webapp/jsx/components/Patient/PatientDetail'
-
-
+import Home from './main/webapp/jsx/components/Home';
+import PatientDetail from './main/webapp/jsx/components/Patient/PatientDetail';
+import PatientConsultationHistory from './main/webapp/jsx/components/History/PatientConsultationHistory';
 
 export default function App() {
   return (
@@ -24,7 +23,10 @@ export default function App() {
             renders the first one that matches the current URL. */}
         <Switch>
          
-          
+          <Route path="/patient-consultations-history">
+            <PatientConsultationHistory />
+          </Route>
+
           <Route path="/patient-history">
             <PatientDetail />
           </Route>
