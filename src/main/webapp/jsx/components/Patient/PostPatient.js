@@ -121,7 +121,7 @@ const PostPatient = (props) => {
             .then(response => {
                 setSaving(false);
                 props.patientObj.commenced=true
-                toast.success("Vital signs save successful");
+                toast.success("Service Checkin successful");
                 props.toggle()
                 //props.patientsVitalsSigns()
 

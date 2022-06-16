@@ -15,8 +15,10 @@ const Widget = (props) => {
     const patientObj = props.patientObj ? props.patientObj : {}
     const [isLabEnabled, setIsLabEnabled] = useState(false);
     const [isPharmacyEnabled, setIsPharmacyEnabled] = useState(false);
+    const [hasAllergies, setHasAllergies] = useState(false);
     const [latestVitals, setLatestVitals] = useState([]);
     const [dosageUnits, setDosageUnits] = useState([]);
+    const [previousConsultation, setPreviousConsultation] = useState([]);
     const [encounterDate, setEncounterDate] = useState(new Date());
     const { handleSubmit, control, getValues, setError, setValue } = useForm();
     const [inputFields, setInputFields] = useState([
@@ -37,7 +39,7 @@ const Widget = (props) => {
                 "visitId": patientObj.visitId,
                 "visitNotes": data.visitNote
             }
-            await axios.post(`http://localhost:8282/api/consultations`, InData, { headers: {"Authorization" : `Bearer ${token}`} });
+            await axios.post(`${baseUrl}consultations`, InData, { headers: {"Authorization" : `Bearer ${token}`} });
             toast.success("Successfully Saved Consultation !", {
                 position: toast.POSITION.TOP_RIGHT
             });
@@ -95,12 +97,24 @@ const Widget = (props) => {
         }
     }, []);
 
+    const loadPreviousConsultation = useCallback(async () => {
+        try {
+            const response = await axios.get(`${baseUrl}consultations/consultations-by-patient-id/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`}});
+            setPreviousConsultation(response.data);
+        } catch (e) {
+            toast.error("An error occurred while fetching previous consultation", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+        }
+    }, []);
+
     useEffect(() => {
         loadPharmacyCheck();
         loadLabCheck();
         loadLatestVitals();
         loadDosageUnits();
-    }, [loadPharmacyCheck, loadLabCheck, loadLatestVitals, loadDosageUnits]);
+        loadPreviousConsultation();
+    }, [loadPharmacyCheck, loadLabCheck, loadLatestVitals, loadDosageUnits, loadPreviousConsultation]);
 
     let dosageUnitsRows = null;
     if (dosageUnits && dosageUnits.length > 0) {
@@ -188,17 +202,19 @@ const Widget = (props) => {
                     </Label>
                 </Segment>
 
-                <Segment>
-                    <Label as='a' color='red' ribbon>
-                        Allergies
-                    </Label>
-                    <br/><br/>
+                { hasAllergies &&
+                    <Segment>
+                        <Label as='a' color='red' ribbon>
+                            Allergies
+                        </Label>
+                        <br/><br/>
 
-                    <Label.Group color='blue'>
-                        <Label as='a'  size="mini">dust</Label>
-                        <Label as='a'  size="mini">smoke</Label>
-                    </Label.Group>
-                </Segment>
+                        <Label.Group color='blue'>
+                            <Label as='a'  size="mini">dust</Label>
+                            <Label as='a'  size="mini">smoke</Label>
+                        </Label.Group>
+                    </Segment>
+                }
             </Grid.Column>
 
             <Grid.Column width={9}>
@@ -359,18 +375,28 @@ const Widget = (props) => {
                                                 />
                                             </Table.Cell>
                                             <Table.Cell>
-                                                <input type="radio" id="Primary" name="diagnosisOrder" value="1" value={diagInputField.diagnosisOrder} onChange={event => handleInputDiagChange(diagIndex, event)} />
-                                                <label htmlFor="Primary">Primary</label><br />
-                                                <input type="radio" id="Secondary" name="diagnosisOrder" value={diagInputField.diagnosisOrder}
-                                                       value="2" onChange={event => handleInputDiagChange(diagIndex, event)} />
-                                                <label htmlFor="Secondary">Secondary</label>
+                                                <select
+                                                    className="ui fluid selection dropdown"
+                                                    value={diagInputField.diagnosisOrder}
+                                                    onChange={event => handleInputDiagChange(diagIndex, event)}
+                                                    name="diagnosisOrder"
+                                                    id="diagnosisOrder">
+                                                    <option></option>
+                                                    <option value="1">Primary</option>
+                                                    <option value="2">Secondary</option>
+                                                </select>
                                             </Table.Cell>
                                             <Table.Cell>
-                                                <input type="radio" value={diagInputField.certainty} id="Presumed" name="certainty" value="1" onChange={event => handleInputDiagChange(diagIndex, event)} />
-                                                <label htmlFor="Presumed">Presumed</label><br />
-                                                <input type="radio" id="Confirmed" name="certainty"
-                                                       value="2" value={diagInputField.certainty} onChange={event => handleInputDiagChange(diagIndex, event)} />
-                                                <label htmlFor="Confirmed">Confirmed</label>
+                                                <select
+                                                    className="ui fluid selection dropdown"
+                                                    value={diagInputField.certainty}
+                                                    onChange={event => handleInputDiagChange(diagIndex, event)}
+                                                    name="certainty"
+                                                    id="certainty">
+                                                    <option></option>
+                                                    <option value="1">Presumed</option>
+                                                    <option value="2">Confirmed</option>
+                                                </select>
                                             </Table.Cell>
                                             <Table.Cell></Table.Cell>
                                         </Table.Row>
@@ -530,12 +556,6 @@ const Widget = (props) => {
             <Segment>
             <List>
                   <List.Item>
-                  <Button icon labelPosition='right' color='teal' fluid>
-                      <Icon name='external alternate' />
-                        Post Patient
-                    </Button>
-                  </List.Item>
-                  <List.Item>
                   <Button icon labelPosition='right' color='green' fluid>
                       <Icon name='eye' />
                         View History
@@ -548,33 +568,30 @@ const Widget = (props) => {
                     </Button>
                   </List.Item>
             </List>
-            <Card>
-            <Card.Content>
-              <b>Previous Clinical Notes</b>
-            </Card.Content>
-            <Card.Content>
-              <Feed>
-                <Feed.Event>
-                  <Feed.Content>
-                    <Feed.Date content='20-03-2022' />
-                    <Feed.Summary>
-                      The malaria is plus 3 and and need more attention
-                    </Feed.Summary>
-                  </Feed.Content>
-                </Feed.Event>
-                <hr/>
-                <Feed.Event>
-                  <Feed.Content>
-                    <Feed.Date content='20-05-2022' />
-                    <Feed.Summary>
-                      Blood presure is too high
-                    </Feed.Summary>
-                  </Feed.Content>
-                </Feed.Event>
-              </Feed>
-            </Card.Content>
-          </Card>
-
+                { previousConsultation &&
+                    <Card>
+                        <Card.Content>
+                            <b>Previous Clinical Notes</b>
+                        </Card.Content>
+                        <Card.Content>
+                            <Feed>
+                                { previousConsultation.map((consultation, i) => (
+                                    <div>
+                                        <Feed.Event>
+                                            <Feed.Content>
+                                                <Feed.Date content={consultation.encounterDate} />
+                                                <Feed.Summary>
+                                                    {consultation.visitNotes}
+                                                </Feed.Summary>
+                                            </Feed.Content>
+                                        </Feed.Event>
+                                        <hr/>
+                                    </div>
+                                )) }
+                            </Feed>
+                        </Card.Content>
+                    </Card>
+                }
             </Segment>
           </Grid.Column>
         </Grid>
