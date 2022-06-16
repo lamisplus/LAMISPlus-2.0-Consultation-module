@@ -26,7 +26,7 @@ public class Consultation extends Audit<String> {
     @Column(name = "patient_id")
     private int patientId;
     @Column(name = "encounter_date")
-    private LocalDateTime encounterDate;
+    private LocalDate encounterDate;
     @Column(name = "visit_notes")
     private String visitNotes;
 

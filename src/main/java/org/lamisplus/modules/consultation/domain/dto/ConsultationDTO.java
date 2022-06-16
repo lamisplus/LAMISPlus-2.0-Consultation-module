@@ -5,6 +5,7 @@ import lombok.Data;
 import org.lamisplus.modules.consultation.domain.entity.Diagnosis;
 import org.lamisplus.modules.consultation.domain.entity.PresentingComplaint;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,8 +15,8 @@ public class ConsultationDTO {
     private int visitId;
     private int patientId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDateTime encounterDate;
+    private LocalDate encounterDate;
     private String visitNotes;
-    private List<PresentingComplaint> presentingComplaints;
-    private List<Diagnosis> diagnosisList;
+    private List<PresentingComplaintDTO> presentingComplaints;
+    private List<DiagnosisDTO> diagnosisList;
 }

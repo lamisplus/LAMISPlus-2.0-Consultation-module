@@ -19,6 +19,7 @@ public class ConsultationService {
     private final ConsultationMapper mapper;
 
     public ConsultationDTO Save(ConsultationDTO consultationDTO){
+
         Consultation consultation = mapper.toConsultation(consultationDTO);
         consultation.setUuid(UUID.randomUUID().toString());
         return mapper.toConsultationDto(repository.save(consultation));
