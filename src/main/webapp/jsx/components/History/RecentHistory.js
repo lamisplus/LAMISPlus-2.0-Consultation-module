@@ -4,12 +4,14 @@ import { useForm, Controller } from "react-hook-form";
 import DateFnsUtils from '@date-io/date-fns';
 import axios from "axios";
 import { toast } from 'react-toastify';
-import {token, url as baseUrl} from "../../../api";
+import {token, url as baseUrl, apiUrl as apiUrl } from "../../../api";
 import { Grid, Segment, Label, Icon, List,Button, Card, Feed, Input, Radio } from 'semantic-ui-react';
 // Page titie
 import {  Checkbox, Table } from 'semantic-ui-react';
 import {format} from "date-fns";
 import { Link, useHistory } from 'react-router-dom';
+import ButtonMui from "@material-ui/core/Button";
+import AddPharmacyOrder from './AddPharmacyOrder';
 
 
 const Widget = (props) => {
@@ -17,8 +19,8 @@ const Widget = (props) => {
     const [isLabEnabled, setIsLabEnabled] = useState(false);
     const [isPharmacyEnabled, setIsPharmacyEnabled] = useState(false);
     const [hasAllergies, setHasAllergies] = useState(false);
+    const [pharmacyModal, setPharmacyModal] = useState(false);
     const [latestVitals, setLatestVitals] = useState([]);
-    const [dosageUnits, setDosageUnits] = useState([]);
     const [previousConsultation, setPreviousConsultation] = useState([]);
     const [encounterDate, setEncounterDate] = useState(new Date());
     const { handleSubmit, control, getValues, setError, setValue } = useForm();
@@ -29,18 +31,31 @@ const Widget = (props) => {
         { certainty: '', diagnosis: '', diagnosisOrder: 0 }
     ]);
     const history = useHistory();
+    const toggle = () => setPharmacyModal(!pharmacyModal);
 
     const onSubmit = async (data) => {
+        const diagnosisList = [];
+        const presentingComplaints = [];
+        for (const inputFieldsDiag of inputFieldsDiagnosis) {
+            if (inputFieldsDiag.diagnosis) {
+                diagnosisList.push(inputFieldsDiag);
+            }
+        }
+        for (const inputField of inputFields) {
+            if (inputField.complaint) {
+                presentingComplaints.push(inputField);
+            }
+        }
         try {
             const InData = {
-                "diagnosisList": inputFieldsDiagnosis.diagnosis ? inputFieldsDiagnosis : [],
+                "diagnosisList": diagnosisList,
                 "encounterDate": format(new Date(data.encounterDate.toString()), 'yyyy-MM-dd'),
                 "id": 0,
                 "patientId": patientObj.id,
-                "presentingComplaints": inputFields.complaint ? inputFields : [],
+                "presentingComplaints": presentingComplaints,
                 "visitId": patientObj.visitId,
                 "visitNotes": data.visitNote
-            }
+            };
             await axios.post(`${baseUrl}consultations`, InData, { headers: {"Authorization" : `Bearer ${token}`} });
             toast.success("Successfully Saved Consultation !", {
                 position: toast.POSITION.TOP_RIGHT
@@ -54,6 +69,9 @@ const Widget = (props) => {
     };
     const OnError = (errors) => {
         console.error(errors);
+        toast.error("Visit Note Is Required", {
+            position: toast.POSITION.TOP_RIGHT
+        });
     };
 
     const loadLabCheck = useCallback(async () => {
@@ -89,17 +107,6 @@ const Widget = (props) => {
         }
     }, []);
 
-    const loadDosageUnits = useCallback(async () => {
-        try {
-            const response = await axios.get(`${baseUrl}application-codesets/v2/DOSE_STRENGTH_UNIT`, { headers: {"Authorization" : `Bearer ${token}`}});
-            setDosageUnits(response.data);
-        } catch (e) {
-            toast.error("An error occurred while fetching DOSE STRENGTH UNIT", {
-                position: toast.POSITION.TOP_RIGHT
-            });
-        }
-    }, []);
-
     const loadPreviousConsultation = useCallback(async () => {
         try {
             const response = await axios.get(`${baseUrl}consultations/consultations-by-patient-id/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`}});
@@ -115,16 +122,9 @@ const Widget = (props) => {
         loadPharmacyCheck();
         loadLabCheck();
         loadLatestVitals();
-        loadDosageUnits();
         loadPreviousConsultation();
-    }, [loadPharmacyCheck, loadLabCheck, loadLatestVitals, loadDosageUnits, loadPreviousConsultation]);
+    }, [loadPharmacyCheck, loadLabCheck, loadLatestVitals, loadPreviousConsultation]);
 
-    let dosageUnitsRows = null;
-    if (dosageUnits && dosageUnits.length > 0) {
-        dosageUnitsRows = dosageUnits.map((dosageUnit, index) => (
-            <option key={dosageUnit.id} value={dosageUnit.id}>{dosageUnit.display}</option>
-        ));
-    }
 
     const handleAddFields = () => {
         const values = [...inputFields];
@@ -166,6 +166,10 @@ const Widget = (props) => {
         setInputFieldsDiagnosis(values);
     };
 
+    const handleAddPharmacyOrder = () => {
+        setPharmacyModal(!pharmacyModal);
+    };
+
     return (
         <Grid columns='equal'>
             <Grid.Column>
@@ -175,9 +179,9 @@ const Widget = (props) => {
                             Recent Vitals
                         </Label>
                         <br/>
-                        <List celled >
-                            <List.Item>Pulse <span className="float-end"><b>{latestVitals[latestVitals.length - 1].pulse}mpb</b></span></List.Item>
-                            <List.Item>Respiratory Rate <span className="float-end"><b>{latestVitals[latestVitals.length - 1].respiratoryRate}mpb</b></span></List.Item>
+                        <List celled>
+                            <List.Item>Pulse <span className="float-end"><b>{latestVitals[latestVitals.length - 1].pulse}bpm</b></span></List.Item>
+                            <List.Item>Respiratory Rate <span className="float-end"><b>{latestVitals[latestVitals.length - 1].respiratoryRate}bpm</b></span></List.Item>
                             <List.Item>Temperature <span className="float-end"><b>{latestVitals[latestVitals.length - 1].temperature}<sup>0</sup>C</b></span></List.Item>
                             <List.Item>Blood Presure <span  className="float-end"><b>{latestVitals[latestVitals.length - 1].systolic}/{latestVitals[latestVitals.length - 1].diastolic}</b></span></List.Item>
                             <List.Item>Height <span  className="float-end"><b>{latestVitals[latestVitals.length - 1].height}m</b></span></List.Item>
@@ -465,91 +469,14 @@ const Widget = (props) => {
                         <br/>
                         { isPharmacyEnabled &&
                             <div>
-                                <Label as='a' color='purple' ribbon>
-                                    Medication Prescription
-                                </Label>
-
-                                <Table color="purple" celled>
-                                    <Table.Header>
-                                        <Table.Row>
-                                            <Table.HeaderCell>Drug</Table.HeaderCell>
-                                            <Table.HeaderCell>Dosage Strength</Table.HeaderCell>
-                                            <Table.HeaderCell>Dosage Unit</Table.HeaderCell>
-                                            <Table.HeaderCell>Dosage Frequency</Table.HeaderCell>
-                                            <Table.HeaderCell>Start Date</Table.HeaderCell>
-                                            <Table.HeaderCell>Duration</Table.HeaderCell>
-                                            <Table.HeaderCell>Duration Unit</Table.HeaderCell>
-                                        </Table.Row>
-                                    </Table.Header>
-
-                                    <Table.Body>
-                                        <Table.Row>
-                                            <Table.Cell>
-                                                <select
-                                                    className="ui fluid selection dropdown"
-                                                    name="drug"
-                                                    id="drug">
-                                                    <option value={""}></option>
-                                                </select>
-                                            </Table.Cell>
-                                            <Table.Cell><Input type="text" fluid  placeholder='Dosage Strength' /></Table.Cell>
-                                            <Table.Cell>
-                                                <select
-                                                    className="ui fluid selection dropdown"
-                                                    name="dosageUnit"
-                                                    id="dosageUnit">
-                                                    <option value={""}></option>
-                                                    {dosageUnitsRows}
-                                                </select>
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                <Input
-                                                name="dosageFrequency"
-                                                id="dosageFrequency"
-                                                type="text"
-                                                fluid
-                                                placeholder='Dosage Frequency' />
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                <Input
-                                                    name="startDate"
-                                                    id="startDate"
-                                                    type="date"
-                                                    fluid
-                                                    placeholder='Start Date' />
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                <Input
-                                                    name="duration"
-                                                    id="duration"
-                                                    type="text"
-                                                    fluid
-                                                    placeholder='Duration' />
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                <select
-                                                    className="ui fluid selection dropdown"
-                                                    name="durationUnit"
-                                                    id="durationUnit">
-                                                    <option value={""}></option>
-                                                </select>
-                                            </Table.Cell>
-                                        </Table.Row>
-
-                                    </Table.Body>
-
-                                    <Table.Footer>
-                                        <Table.Row>
-                                            <Table.HeaderCell>
-
-                                                <Label as='a' color="blue" size="tiny">
-                                                    <Icon name='plus' /> Add New Drug Order
-                                                </Label>
-                                            </Table.HeaderCell>
-
-                                        </Table.Row>
-                                    </Table.Footer>
-                                </Table>
+                                <ButtonMui
+                                    variant="contained"
+                                    color="primary"
+                                    className="ms-2"
+                                    onClick={() => handleAddPharmacyOrder()}
+                                >
+                                    <span style={{ textTransform: "capitalize" }}>Add Pharmacy Order</span>
+                                </ButtonMui>
                             </div>
                         }
                     </Segment>
@@ -604,6 +531,7 @@ const Widget = (props) => {
                 }
             </Segment>
           </Grid.Column>
+            <AddPharmacyOrder toggle={toggle} patientObj={patientObj} showModal={pharmacyModal} />
         </Grid>
     );
   };

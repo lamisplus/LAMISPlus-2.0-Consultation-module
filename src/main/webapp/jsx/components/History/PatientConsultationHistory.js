@@ -25,6 +25,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { makeStyles } from '@material-ui/core/styles'
 import "@reach/menu-button/styles.css";
 import ButtonMui from "@material-ui/core/Button";
+import { toast } from 'react-toastify';
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -100,7 +101,9 @@ const PatientConsultationHistory = (props) => {
             const response = await axios.get(`${baseUrl}consultations/consultations-by-patient-id/${patientObj.id}`, {headers: {"Authorization": `Bearer ${token}`}});
             setPatientList(response.data);
         } catch (e) {
-            
+            toast.error("An error occured while fetching consultation !", {
+                position: toast.POSITION.TOP_RIGHT
+            });
         }
 
     }, []);
@@ -108,6 +111,15 @@ const PatientConsultationHistory = (props) => {
     useEffect(() => {
         patientConsultations()
     }, [patientConsultations]);
+
+    console.log(patientList);
+
+    const formatDiagnosis = diagnosisList => {
+        return diagnosisList.map(obj => obj.diagnosis) + " ,";
+    };
+    const formatPresentingComplaints = presentingComplaintsList => {
+        return presentingComplaintsList.map(obj => obj.complaint) + " ,";
+    };
 
     return (
         <div>
@@ -136,11 +148,15 @@ const PatientConsultationHistory = (props) => {
                         field: "date",
                     },
                     { title: "Visit Notes", field: "visitNotes", filtering: false },
+                    { title: "Diagnosis List", field: "diagnosisList", filtering: false },
+                    { title: "Presenting Complaints", field: "presentingComplaints", filtering: false },
                 ]}
                 data={ patientList.map((row) => ({
                     //Id: manager.id,
                     date:row.encounterDate,
                     visitNotes:row.visitNotes,
+                    diagnosisList:formatDiagnosis(row.diagnosisList),
+                    presentingComplaints:formatPresentingComplaints(row.presentingComplaints),
                 }))}
 
                 options={{

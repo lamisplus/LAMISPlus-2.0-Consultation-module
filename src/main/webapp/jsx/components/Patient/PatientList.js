@@ -28,6 +28,7 @@ import { MdDashboard } from "react-icons/md";
 import {Menu,MenuList,MenuButton,MenuItem,} from "@reach/menu-button";
 import "@reach/menu-button/styles.css";
 import moment from "moment";
+import {toast} from "react-toastify";
 
 
 const tableIcons = {
@@ -111,7 +112,9 @@ const Patients = (props) => {
                 setPatientList(response.data);
             })
             .catch((error) => {
-                console.log(error);
+                toast.error("An error occurred while fetching checked-in patients", {
+                    position: toast.POSITION.TOP_RIGHT
+                });
             });
     }
     const calculate_age = dob => {
