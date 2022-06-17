@@ -88,8 +88,8 @@ const AddPharmacyOrder = (props) => {
         try {
             e.preventDefault();
             setSaving(true);
-            pharmacyOrder.encounterDateTime = null;
-            pharmacyOrder.dateTimePrescribed = format(new Date(), 'yyyy-MM-dd hh:mm:ss');
+            pharmacyOrder.encounterDateTime = format(new Date(), 'yyyy-MM-dd@hh:mm:ss');
+            pharmacyOrder.dateTimePrescribed = format(new Date(), 'yyyy-MM-dd@hh:mm:ss');
             await axios.post(`${apiUrl}drug-orders`, { "drugOrders": [pharmacyOrder] },{ headers: {"Authorization" : `Bearer ${token}`}});
             setSaving(false);
             props.toggle()

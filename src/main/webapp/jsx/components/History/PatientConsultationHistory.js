@@ -112,8 +112,6 @@ const PatientConsultationHistory = (props) => {
         patientConsultations()
     }, [patientConsultations]);
 
-    console.log(patientList);
-
     const formatDiagnosis = diagnosisList => {
         return diagnosisList.map(obj => obj.diagnosis) + " ,";
     };
