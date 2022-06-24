@@ -52,6 +52,8 @@ const styles = theme => ({
 });
 
 function PatientCard(props) {
+console.log("props", props);
+
   const { classes } = props;
   const patientObjs = props.patientObj ? props.patientObj : {}
   const [patientObj, setpatientObj] = useState(patientObjs)
@@ -76,36 +78,39 @@ function PatientCard(props) {
     };
 
   
-  const CurrentStatus = ()=>{
+    const CurrentStatus = ()=>{
 
         return (  <Label color="blue" size="mini">Active</Label>);
 }
-const getHospitalNumber = (identifier) => {     
-  const identifiers = identifier;
-  const hospitalNumber = identifiers.identifier.find(obj => obj.type == 'HospitalNumber');       
-  return hospitalNumber ? hospitalNumber.value : '';
-};
-const getPhoneNumber = (identifier) => {     
-  const identifiers = identifier;
-  const phoneNumber = identifiers.contactPoint.find(obj => obj.type == 'phone');       
-  return phoneNumber ? phoneNumber.value : '';
-};
-const getAddress = (identifier) => {     
-  const identifiers = identifier;
-  const address = identifiers.address.find(obj => obj.city);      
-  return address ? address.city : '';
-};
 
-const PostPatientService =(row)=> {
-  setpatientObj({...patientObj, ...row});
-  setModal(!modal)
-}
+    const getHospitalNumber = (identifier) => {
+      const identifiers = identifier;
+      const hospitalNumber = identifiers.identifier.find(obj => obj.type == 'HospitalNumber');
+      return hospitalNumber ? hospitalNumber.value : '';
+    };
+
+    const getPhoneNumber = (identifier) => {
+      const identifiers = identifier;
+      const phoneNumber = identifiers.contactPoint.find(obj => obj.type == 'phone');
+      return phoneNumber ? phoneNumber.value : '';
+    };
+
+    const getAddress = (identifier) => {
+      const identifiers = identifier;
+      const address = identifiers.address.find(obj => obj.city);
+      return address ? address.city : '';
+    };
+
+    const PostPatientService =(row)=> {
+      setpatientObj({...patientObj, ...row});
+      setModal(!modal)
+    }
 
   
   return (
     <div className={classes.root}>
        <ExpansionPanel defaultExpanded>
-                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                <ExpansionPanelSummary expandicon={<ExpandMoreIcon />}>
                 
                 <Row>
                     

@@ -13,9 +13,10 @@ import { Link, useHistory } from 'react-router-dom';
 import ButtonMui from "@material-ui/core/Button";
 import AddPharmacyOrder from './AddPharmacyOrder';
 
-
 const Widget = (props) => {
-    const patientObj = props.patientObj ? props.patientObj : {}
+    let history = useHistory();
+    const patientObj = history.location && history.location.state ? history.location.state.patientObj : {}
+    //console.log("vist", patientObj)
     const [isLabEnabled, setIsLabEnabled] = useState(false);
     const [isPharmacyEnabled, setIsPharmacyEnabled] = useState(false);
     const [hasAllergies, setHasAllergies] = useState(false);
@@ -24,19 +25,14 @@ const Widget = (props) => {
     const [previousConsultation, setPreviousConsultation] = useState([]);
     const [encounterDate, setEncounterDate] = useState(new Date());
     const { handleSubmit, control, getValues, setError, setValue } = useForm();
-    const [inputFields, setInputFields] = useState([
-        { complaint: '', onsetDate: '', severity: 0, dateResolved: '' }
-    ]);
-    const [inputFieldsDiagnosis, setInputFieldsDiagnosis] = useState([
-        { certainty: '', diagnosis: '', diagnosisOrder: 0 }
-    ]);
+    const [inputFields, setInputFields] = useState(patientObj.presentingComplaints);
+    const [inputFieldsDiagnosis, setInputFieldsDiagnosis] = useState(patientObj.diagnosisList);
 
     const [inputFieldsLab, setInputFieldsLab] = useState([
             { encounterDate: format(new Date(), 'yyyy-MM-dd'), labOrder: '',
             labTest: '', priority: '', status: '' }
         ]);
 
-    const history = useHistory();
     const toggle = () => setPharmacyModal(!pharmacyModal);
 
     const onSubmit = async (data) => {
@@ -103,7 +99,7 @@ const Widget = (props) => {
             toast.success("Successfully Saved Consultation !", {
                 position: toast.POSITION.TOP_RIGHT
             });
-           history.push('/');
+           history.push('/patient-consultations-history');
 
         } catch (e) {
             toast.error("An error occured while saving Consultation !", {
@@ -147,7 +143,7 @@ const Widget = (props) => {
 
     const loadLatestVitals = useCallback(async () => {
         try {
-            const response = await axios.get(`${baseUrl}patient/vital-sign/person/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`}});
+            const response = await axios.get(`${baseUrl}patient/vital-sign/person/${patientObj.patientId}`, { headers: {"Authorization" : `Bearer ${token}`}});
             setLatestVitals(response.data);
         } catch (e) {
             toast.error("An error occurred while fetching vitals", {
@@ -190,6 +186,54 @@ const Widget = (props) => {
             }
         }, []);
 
+    const consultations_by_visitId = useCallback(async () => {
+            try {
+                const response = await axios.get(`${baseUrl}consultations/consultations-by-visit-id/${patientObj.visitId}`,
+                { headers: {"Authorization" : `Bearer ${token}`}});
+                //console.log("consult", response.data);
+                //setPriorities(response.data);
+            } catch (e) {
+                toast.error("An error occurred while fetching priority data", {
+                    position: toast.POSITION.TOP_RIGHT
+                });
+            }
+        }, []);
+
+     const labtest_by_visitId = useCallback(async () => {
+                    try {
+                        const response = await axios.get(`${baseUrl}laboratory/orders-by-visit-id/${patientObj.visitId}`,
+                        { headers: {"Authorization" : `Bearer ${token}`}});
+
+                        const labTests = [];
+
+                        for (const lab of response.data) {
+
+                            for (const data of lab.tests) {
+                                let labTestGroup = data.labTestGroupId;
+                                let labTestId = data.labTestId;
+                                let orderPriority = data.orderPriority;
+                                let labTestOrderStatus = data.labTestOrderStatus;
+
+                                let labdata = {
+                                  labOrder: labTestGroup,
+                                  labTest: labTestId,
+                                  priority: orderPriority,
+                                  status: labTestOrderStatus
+                                  };
+
+                                console.log("lab test", labdata);
+                                labTests.push(labdata)
+                            }
+                        }
+
+                         setInputFieldsLab(labTests);
+                    } catch (e) {
+                        toast.error("An error occurred while fetching priority data", {
+                            position: toast.POSITION.TOP_RIGHT
+                        });
+                    }
+                }, []);
+
     useEffect(() => {
         loadPharmacyCheck();
         loadLabCheck();
@@ -197,6 +241,8 @@ const Widget = (props) => {
         loadPreviousConsultation();
         loadLabGroup();
         priority();
+        consultations_by_visitId();
+        labtest_by_visitId();
     }, [loadPharmacyCheck, loadLabCheck, loadLatestVitals, loadPreviousConsultation, loadLabGroup, priority]);
 
     const handleAddFields = () => {
@@ -350,7 +396,7 @@ const Widget = (props) => {
                                         <KeyboardDateTimePicker
                                             disableFuture
                                             format="dd/MM/yyyy hh:mm a"
-                                            value={encounterDate}
+                                            value={patientObj.encounterDate}
                                             onChange={setEncounterDate}
                                             className="form-control"
                                             invalidDateMessage={"Encounter date is required"}
@@ -366,9 +412,13 @@ const Widget = (props) => {
                             <Controller
                                 name="visitNote"
                                 control={control}
+
                                 rules={{ required: true }}
                                 render={({ field: { ref, ...rest }}) => (
-                                    <textarea className="form-control" {...rest}></textarea>
+                                    <textarea
+                                    className="form-control"
+                                    {...rest}
+                                    >{patientObj.visitNotes}</textarea>
                                 )}
                             />
                         </div>
@@ -677,7 +727,7 @@ const Widget = (props) => {
                   <List.Item>
                   <Button icon labelPosition='right' color='blue' fluid>
                       <Icon name='calendar alternate' />
-                        Appointment 
+                        Appointment
                     </Button>
                   </List.Item>
             </List>

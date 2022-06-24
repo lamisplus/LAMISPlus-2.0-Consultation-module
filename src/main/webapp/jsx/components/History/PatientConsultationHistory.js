@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useHistory } from "react-router-dom";
-import MaterialTable from 'material-table';
+import { useHistory, Link  } from "react-router-dom";
+import MaterialTable, { MTableToolbar, cellStyle, headerStyle } from 'material-table';
 import axios from "axios";
 import {token, url as baseUrl} from "../../../api";
 import { forwardRef } from 'react';
+import { Container, Button, Icon } from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css';
-import { Link } from 'react-router-dom'
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
 import Check from '@material-ui/icons/Check';
@@ -121,59 +121,84 @@ const PatientConsultationHistory = (props) => {
 
     return (
         <div>
-            <br/><br/>
-            <Link to={"/"} >
-                <ButtonMui
-                    variant="contained"
-                    color="primary"
-                    className=" float-end ms-2"
+         <Container>
+                <br/><br/>
+                        <Link to={"/"} >
+                            <ButtonMui
+                                variant="contained"
+                                color="primary"
+                                className=" float-end ms-2"
+                            >
+                                <span style={{ textTransform: "capitalize" }}>Back</span>
+                            </ButtonMui>
 
-                >
-                    <span style={{ textTransform: "capitalize" }}>Back</span>
-                </ButtonMui>
+                        </Link>
+                        <br/><br/>
 
-            </Link>
-            <br/><br/>
+                        <MaterialTable
+                            icons={tableIcons}
+                            title="Patient Consultations"
+                            columns={[
+                                // { title: " ID", field: "Id" },
+                                {
+                                  title: "Encounter Date", field: "date",
+                                    cellStyle: {
+                                          backgroundColor: '#039be5',
+                                          color: '#FFF'
+                                        },
+                                        headerStyle: {
+                                          backgroundColor: '#039be5',
+                                        }
+                                },
+                                { title: "Visit Notes", field: "visitNotes", filtering: false },
+                                { title: "Diagnosis List", field: "diagnosisList", filtering: false },
+                                { title: "Presenting Complaints", field: "presentingComplaints", filtering: false },
+                                { title: "Actions", field: "actions", filtering: false },
+                            ]}
+                            data={ patientList.map((row) => ({
+                                //Id: manager.id,
+                                date:row.encounterDate,
+                                visitNotes:row.visitNotes,
+                                diagnosisList:formatDiagnosis(row.diagnosisList),
+                                presentingComplaints:formatPresentingComplaints(row.presentingComplaints),
+                                actions:
+                                    <div>
+                                        <Link
+                                            to={{
+                                                pathname: "/patient-consultation",
+                                                state: { patientObj: row  }
+                                            }}>
+                                             <Button
+                                                icon
+                                                inverted
+                                                color='blue'
+                                                className=" float-end ms-2"
+                                             >
+                                             <Icon name='eye' />
+                                            </Button>
+                                        </Link>
+                                    </div>
 
+                            }))}
 
-            <MaterialTable
-                icons={tableIcons}
-                title="Patient Consultations"
-                columns={[
-                    // { title: " ID", field: "Id" },
-                    {
-                        title: "Encounter Date",
-                        field: "date",
-                    },
-                    { title: "Visit Notes", field: "visitNotes", filtering: false },
-                    { title: "Diagnosis List", field: "diagnosisList", filtering: false },
-                    { title: "Presenting Complaints", field: "presentingComplaints", filtering: false },
-                ]}
-                data={ patientList.map((row) => ({
-                    //Id: manager.id,
-                    date:row.encounterDate,
-                    visitNotes:row.visitNotes,
-                    diagnosisList:formatDiagnosis(row.diagnosisList),
-                    presentingComplaints:formatPresentingComplaints(row.presentingComplaints),
-                }))}
-
-                options={{
-                    headerStyle: {
-                        //backgroundColor: "#9F9FA5",
-                        color: "#000",
-                    },
-                    searchFieldStyle: {
-                        width : '200%',
-                        margingLeft: '250px',
-                    },
-                    filtering: false,
-                    exportButton: false,
-                    searchFieldAlignment: 'left',
-                    pageSizeOptions:[10,20,100],
-                    pageSize:10,
-                    debounceInterval: 400
-                }}
-            />
+                            options={{
+                                headerStyle: {
+                                    backgroundColor: "#01579b",
+                                    color: "#ccc",
+                                },
+                                searchFieldStyle: {
+                                    width : '200%',
+                                    margingLeft: '250px',
+                                },
+                                filtering: false,
+                                exportButton: false,
+                                searchFieldAlignment: 'left',
+                                pageSizeOptions:[10,20,100],
+                                pageSize:10,
+                                debounceInterval: 400
+                            }}
+                        />
+         </Container>
         </div>
     );
 };

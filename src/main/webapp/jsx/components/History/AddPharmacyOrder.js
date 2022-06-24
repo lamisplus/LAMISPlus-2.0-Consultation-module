@@ -66,7 +66,7 @@ const AddPharmacyOrder = (props) => {
     const [durationUnits, setDurationUnits] = useState([]);
 
     const [pharmacyOrder, setPharmacyOrder] = useState({
-        encounterDateTime: "",
+        encounterDateTime: format(new Date(), 'yyyy-MM-dd'),
         drugName: "",
         dosageStrength: "",
         dosageStrengthUnit: "",
@@ -90,7 +90,15 @@ const AddPharmacyOrder = (props) => {
             setSaving(true);
             pharmacyOrder.encounterDateTime = format(new Date(), 'yyyy-MM-dd@hh:mm:ss');
             pharmacyOrder.dateTimePrescribed = format(new Date(), 'yyyy-MM-dd@hh:mm:ss');
-            await axios.post(`${apiUrl}drug-orders`, { "drugOrders": [pharmacyOrder] },{ headers: {"Authorization" : `Bearer ${token}`}});
+
+            console.log(pharmacyOrder)
+            await axios.post(`${apiUrl}drug-orders`, { "drugOrders": [pharmacyOrder] },
+            { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
+            console.log("drug saved");
+             toast.success("Successfully Saved drug order!", {
+                            position: toast.POSITION.TOP_RIGHT
+                        });
+            });
             setSaving(false);
             props.toggle()
         } catch (e) {
@@ -143,6 +151,7 @@ const AddPharmacyOrder = (props) => {
     let dosageUnitsRows = null;
     let durationUnitsRows = null;
     if (drugs && drugs.length > 0) {
+        //console.log("drugs", drugs);
         drugRows = drugs.map((drug, index) => (
             <option key={drug.name} value={drug.name}>{drug.name}</option>
         ));

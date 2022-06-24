@@ -81,7 +81,7 @@ const PostPatient = (props) => {
             )
             .then((response) => {
                 const filterService = response.data.filter((x) => x.moduleServiceCode!=='consultation-code')
-                console.log(filterService)
+
                 setServices(
                     Object.entries(filterService).map(([key, value]) => ({
                         label: value.moduleServiceName,
