@@ -199,6 +199,21 @@ const Widget = (props) => {
             }
         }, []);
 
+    const pharmacy_by_visitId = useCallback(async () => {
+                try {
+                    const response = await axios.get(`${apiUrl}drug-orders/orders-by-visit-id/${patientObj.visitId}`,
+                    { headers: {"Authorization" : `Bearer ${token}`}});
+
+                    console.log('id', patientObj.visitId);
+                    console.log("pharmacy", response.data);
+                    //setPriorities(response.data);
+                } catch (e) {
+                    toast.error("An error occurred while fetching pharmacy data", {
+                        position: toast.POSITION.TOP_RIGHT
+                    });
+                }
+            }, []);
+
      const labtest_by_visitId = useCallback(async () => {
                     try {
                         const response = await axios.get(`${baseUrl}laboratory/orders-by-visit-id/${patientObj.visitId}`,
@@ -243,7 +258,9 @@ const Widget = (props) => {
         priority();
         consultations_by_visitId();
         labtest_by_visitId();
-    }, [loadPharmacyCheck, loadLabCheck, loadLatestVitals, loadPreviousConsultation, loadLabGroup, priority]);
+        pharmacy_by_visitId();
+    }, [loadPharmacyCheck, loadLabCheck, loadLatestVitals, loadPreviousConsultation,
+    loadLabGroup, priority, consultations_by_visitId, labtest_by_visitId, pharmacy_by_visitId]);
 
     const handleAddFields = () => {
         const values = [...inputFields];
@@ -417,6 +434,7 @@ const Widget = (props) => {
                                 render={({ field: { ref, ...rest }}) => (
                                     <textarea
                                     className="form-control"
+                                    style={{ minHeight: 100, fontSize: 14 }}
                                     {...rest}
                                     >{patientObj.visitNotes}</textarea>
                                 )}

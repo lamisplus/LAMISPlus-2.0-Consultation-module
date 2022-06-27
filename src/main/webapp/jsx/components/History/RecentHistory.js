@@ -361,14 +361,14 @@ const Widget = (props) => {
                             </MuiPickersUtilsProvider>
                         </div>
 
-                        <div className="input-group input-group-sm mb-3">
+                        <div className="input-group input-group-sm " >
                             <span className="input-group-text">Visit Note</span>
                             <Controller
                                 name="visitNote"
                                 control={control}
                                 rules={{ required: true }}
                                 render={({ field: { ref, ...rest }}) => (
-                                    <textarea className="form-control" {...rest}></textarea>
+                                    <textarea  style={{ minHeight: 100 }} className="form-control" {...rest} ></textarea>
                                 )}
                             />
                         </div>
