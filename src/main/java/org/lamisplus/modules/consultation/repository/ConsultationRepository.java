@@ -14,4 +14,5 @@ import java.util.*;
 @Repository
 public interface ConsultationRepository extends JpaRepository<Consultation, Integer> {
     List<Consultation> findAllByPatientId(int PatientId);
+    List<Consultation> findAllByVisitId(int PatientId);
 }

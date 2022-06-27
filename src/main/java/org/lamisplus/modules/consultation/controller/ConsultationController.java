@@ -36,6 +36,11 @@ public class ConsultationController {
         return service.GetAllEncountersByPatientId(patient_id);
     }
 
+    @GetMapping("/consultations-by-visit-id/{visit_id}")
+    public List<ConsultationDTO> GetConsultationsByVisitId(@PathVariable int visit_id){
+        return service.GetAllEncountersByVisitId(visit_id);
+    }
+
     @DeleteMapping("/{id}")
     public String Delete(@PathVariable Integer id){
         return service.Delete(id);

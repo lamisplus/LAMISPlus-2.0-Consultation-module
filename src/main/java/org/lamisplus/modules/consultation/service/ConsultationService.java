@@ -38,6 +38,10 @@ public class ConsultationService {
         return mapper.toConsultationDtoList(repository.findAllByPatientId(patientId));
     }
 
+    public List<ConsultationDTO> GetAllEncountersByVisitId(int patientId) {
+        return mapper.toConsultationDtoList(repository.findAllByVisitId(patientId));
+    }
+
     public String Delete(int id) {
         Consultation consultation = repository.findById(id).orElse(null);
         repository.delete(consultation);
