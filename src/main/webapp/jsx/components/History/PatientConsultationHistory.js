@@ -131,7 +131,6 @@ const PatientConsultationHistory = (props) => {
                             >
                                 <span style={{ textTransform: "capitalize" }}>Back</span>
                             </ButtonMui>
-
                         </Link>
                         <br/><br/>
 

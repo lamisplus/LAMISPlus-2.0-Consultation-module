@@ -147,7 +147,7 @@ const PatientnHistory = (props) => {
                 { title: "Status", field: "status", filtering: false },        
                 { title: "Actions", field: "actions", filtering: false }, 
               ]}
-              data={ patientList.map((row) => ({
+              data={ patientList.length > 0 ? patientList.map((row) => ({
                   type: "",
                    date: "",
                     v_status: row.participant_id,
@@ -163,19 +163,14 @@ const PatientnHistory = (props) => {
                             <MenuList style={{ color:"#000000 !important"}} >
                                                            
                                   <MenuItem style={{ color:"#000 !important"}}  >
-                                     
                                         <FaShare size="15"  />{" "}
                                         <span style={{color: '#000'}}>View</span>
-                                                                    
                                   </MenuItem>
-                                  
-                                 
-                                  
                           </MenuList>
                     </Menu>
                   </div>
                   
-                  }))}
+                  })) : "No patient vaccination history available"}
             
                         options={{
                           headerStyle: {

@@ -77,7 +77,8 @@ const AddPharmacyOrder = (props) => {
         comments: "",
         patientId: patientObj.id,
         orderedBy: "",
-        dateTimePrescribed: ""
+        dateTimePrescribed: "",
+        visitId: patientObj.visitId
     });
 
     const handleInputChangePharmacyOrderDto = e => {

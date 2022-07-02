@@ -13,7 +13,6 @@ import { Link, useHistory } from 'react-router-dom';
 import ButtonMui from "@material-ui/core/Button";
 import AddPharmacyOrder from './AddPharmacyOrder';
 
-
 const Widget = (props) => {
     const patientObj = props.patientObj ? props.patientObj : {}
     const [isLabEnabled, setIsLabEnabled] = useState(false);
@@ -121,7 +120,6 @@ const Widget = (props) => {
     const [labGroups, setLabGroups] = useState([]);
     const [labTests, setLabTests] = useState([]);
     const [priorities, setPriorities] = useState([]);
-
 
     const loadLabCheck = useCallback(async () => {
         try {
@@ -315,7 +313,6 @@ const Widget = (props) => {
                     </Segment>
                 }
 
-
                 { hasAllergies &&
                     <Segment>
                         <Label as='a' color='red' ribbon>
@@ -331,7 +328,7 @@ const Widget = (props) => {
                 }
             </Grid.Column>
 
-            <Grid.Column width={9}>
+            <Grid.Column width={10}>
                 <form onSubmit={handleSubmit(onSubmit, OnError)}>
                     <Label as='a' color='black' ribbon>
                         <b>Physical Examination</b>
@@ -379,10 +376,10 @@ const Widget = (props) => {
                         <Table color="red" celled>
                             <Table.Header>
                                 <Table.Row>
-                                    <Table.HeaderCell>Complaints</Table.HeaderCell>
-                                    <Table.HeaderCell>Onset Date</Table.HeaderCell>
-                                    <Table.HeaderCell>Severity</Table.HeaderCell>
-                                    <Table.HeaderCell>Date Resolved</Table.HeaderCell>
+                                    <Table.Cell style={{ fontWeight: 'bold'}}>Complaints</Table.Cell>
+                                    <Table.Cell style={{ fontWeight: 'bold'}}>Onset Date</Table.Cell>
+                                    <Table.Cell style={{ fontWeight: 'bold'}}>Severity</Table.Cell>
+                                    <Table.Cell style={{ fontWeight: 'bold'}}>Date Resolved</Table.Cell>
                                 </Table.Row>
                             </Table.Header>
 
@@ -466,10 +463,10 @@ const Widget = (props) => {
                         <Table color="pink" celled>
                             <Table.Header>
                                 <Table.Row>
-                                    <Table.HeaderCell>Condition</Table.HeaderCell>
-                                    <Table.HeaderCell>Order</Table.HeaderCell>
-                                    <Table.HeaderCell>Certainty</Table.HeaderCell>
-                                    <Table.HeaderCell></Table.HeaderCell>
+                                    <Table.Cell style={{ fontWeight: 'bold'}}>Condition</Table.Cell>
+                                    <Table.Cell style={{ fontWeight: 'bold'}}>Order</Table.Cell>
+                                    <Table.Cell style={{ fontWeight: 'bold'}}>Certainty</Table.Cell>
+                                    <Table.Cell style={{ fontWeight: 'bold'}}></Table.Cell>
                                 </Table.Row>
                             </Table.Header>
 
@@ -539,10 +536,10 @@ const Widget = (props) => {
                             <Table color="teal" celled>
                                 <Table.Header>
                                     <Table.Row>
-                                        <Table.HeaderCell>Lab Test Group</Table.HeaderCell>
-                                        <Table.HeaderCell>Lab Test</Table.HeaderCell>
-                                        <Table.HeaderCell>Priority</Table.HeaderCell>
-                                        <Table.HeaderCell>Status</Table.HeaderCell>
+                                        <Table.Cell style={{ fontWeight: 'bold'}}>Lab Test Group</Table.Cell>
+                                        <Table.Cell style={{ fontWeight: 'bold'}}>Lab Test</Table.Cell>
+                                        <Table.Cell style={{ fontWeight: 'bold'}}>Priority</Table.Cell>
+                                        <Table.Cell style={{ fontWeight: 'bold'}}>Status</Table.Cell>
                                     </Table.Row>
                                 </Table.Header>
 

@@ -11,12 +11,12 @@ import {  Checkbox, Table } from 'semantic-ui-react';
 import {format} from "date-fns";
 import { Link, useHistory } from 'react-router-dom';
 import ButtonMui from "@material-ui/core/Button";
-import AddPharmacyOrder from './AddPharmacyOrder';
 
 const Widget = (props) => {
     let history = useHistory();
     const patientObj = history.location && history.location.state ? history.location.state.patientObj : {}
     //console.log("vist", patientObj)
+    const [patient, setPatient] = useState({});
     const [isLabEnabled, setIsLabEnabled] = useState(false);
     const [isPharmacyEnabled, setIsPharmacyEnabled] = useState(false);
     const [hasAllergies, setHasAllergies] = useState(false);
@@ -27,11 +27,28 @@ const Widget = (props) => {
     const { handleSubmit, control, getValues, setError, setValue } = useForm();
     const [inputFields, setInputFields] = useState(patientObj.presentingComplaints);
     const [inputFieldsDiagnosis, setInputFieldsDiagnosis] = useState(patientObj.diagnosisList);
-
     const [inputFieldsLab, setInputFieldsLab] = useState([
             { encounterDate: format(new Date(), 'yyyy-MM-dd'), labOrder: '',
             labTest: '', priority: '', status: '' }
         ]);
+    const [saving, setSaving] = useState(false);
+    const [drugs, setDrugs] = useState([]);
+    const [dosageUnits, setDosageUnits] = useState([]);
+    const [durationUnits, setDurationUnits] = useState([]);
+    const [editPharmacyOrder, setEditPharmacyOrder] = useState({
+        encounterDateTime: format(new Date(), 'yyyy-MM-dd'),
+        drugName: "",
+        dosageStrength: "",
+        dosageStrengthUnit: "",
+        dosageFrequency: "",
+        startDate: "",
+        duration: "",
+        durationUnit: "",
+        comments: "",
+        //patientId: patientObj.id,
+        orderedBy: "",
+        dateTimePrescribed: ""
+    });
 
     const toggle = () => setPharmacyModal(!pharmacyModal);
 
@@ -52,54 +69,63 @@ const Widget = (props) => {
             }
         }
 
-        for (const inputField of inputFieldsLab) {
-
-            if (inputField.encounterDate) {
-                labTests.push({
-                "description": inputField.labOrder.slice(2, inputField.labOrder.length),
-                "id": 0,
-                "labTestGroupId": inputField.labOrder.slice(0, 1),
-                "labTestId": inputField.labTest,
-                "labTestOrderStatus": inputField.status,
-                "orderPriority": inputField.priority,
-//                "unitMeasurement": "",
-//                "viralLoadIndication": 0
-              });
-            }
-        }
-
         try {
             const InData = {
                 "diagnosisList": diagnosisList,
-                "encounterDate": format(new Date(data.encounterDate.toString()), 'yyyy-MM-dd'),
-                "id": 0,
-                "patientId": patientObj.id,
+                "encounterDate": patientObj.encounterDate,
+                "patientId": patientObj.patientId,
+                "id": patientObj.id,
                 "presentingComplaints": presentingComplaints,
                 "visitId": patientObj.visitId,
-                "visitNotes": data.visitNote
+                "visitNotes": patientObj.visitNotes
             };
 
+            await axios.put(`${baseUrl}consultations/${patientObj.id}`, InData,
+            { headers: {"Authorization" : `Bearer ${token}`} }).then(( resp ) =>{
+                console.log("diagnosis updated successfully", resp)
+            });
+
+            for (const inputField of inputFieldsLab) {
+
+                if (inputField.id) {
+                    labTests.push({
+                    "id": inputField.id,
+                    "labTestGroupId": inputField.labOrder,
+                    "labTestId": inputField.labTest,
+                    "labTestOrderStatus": inputField.status,
+                    "orderPriority": inputField.priority,
+                  });
+                }
+            }
+
             const labOrder = {
-                  "orderDate": format(new Date(data.encounterDate.toString()), 'yyyy-MM-dd'),
-                  //"orderTime": new Date().toLocaleTimeString(),
+                  "id": inputFieldsLab[0].id,
+                  "orderDate": inputFieldsLab[0].orderDate,
                   "patientId": patientObj.id,
                   "tests": labTests,
                   "visitId": patientObj.visitId
             }
-            await axios.post(`${baseUrl}consultations`, InData,
-            { headers: {"Authorization" : `Bearer ${token}`} }).then(( resp ) =>{
-                console.log("diagnosis saved", resp)
 
-                axios.post(`${baseUrl}laboratory/orders`, labOrder,
-                { headers: {"Authorization" : `Bearer ${token}`} }).then(( resp ) =>{
-                    console.log("lab served", resp)
-                });
+            console.log("lb", labOrder)
+
+            axios.put(`${baseUrl}laboratory/orders/${inputFieldsLab[0].orderId}`, labOrder,
+            { headers: {"Authorization" : `Bearer ${token}`} }).then(( resp ) => {
+               console.log("lab updated successfully", resp)
             });
 
-            toast.success("Successfully Saved Consultation !", {
-                position: toast.POSITION.TOP_RIGHT
-            });
-           history.push('/patient-consultations-history');
+            for (const pharm of editPharmacyOrder) {
+                console.log("pharmdata", pharm)
+
+                 axios.put(`${apiUrl}drug-orders/${pharm.id}`, pharm,
+                    { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
+                        console.log("drug updated successfully", resp );
+                    });
+            }
+//
+//            toast.success("Successfully updated Consultation !", {
+//                position: toast.POSITION.TOP_RIGHT
+//            });
+//           history.push('/patient-consultations-history');
 
         } catch (e) {
             toast.error("An error occured while saving Consultation !", {
@@ -107,6 +133,7 @@ const Widget = (props) => {
             });
         }
     };
+
     const OnError = (errors) => {
         console.error(errors);
         toast.error("Visit Note Is Required", {
@@ -118,6 +145,18 @@ const Widget = (props) => {
     const [labTests, setLabTests] = useState([]);
     const [priorities, setPriorities] = useState([]);
 
+    const patient_by_Id = useCallback(async () => {
+        try {
+            const response = await axios.get(`${baseUrl}patient/${patientObj.patientId}`,
+            { headers: {"Authorization" : `Bearer ${token}`}});
+           // console.log("patient", response.data);
+            //setPriorities(response.data);
+        } catch (e) {
+            toast.error("An error occurred while fetching priority data", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+        }
+    }, []);
 
     const loadLabCheck = useCallback(async () => {
         try {
@@ -200,54 +239,98 @@ const Widget = (props) => {
         }, []);
 
     const pharmacy_by_visitId = useCallback(async () => {
-                try {
-                    const response = await axios.get(`${apiUrl}drug-orders/orders-by-visit-id/${patientObj.visitId}`,
-                    { headers: {"Authorization" : `Bearer ${token}`}});
+        try {
+            const response = await axios.get(`${apiUrl}drug-orders/visits/${patientObj.visitId}`,
+            { headers: {"Authorization" : `Bearer ${token}`}});
 
-                    console.log('id', patientObj.visitId);
-                    console.log("pharmacy", response.data);
-                    //setPriorities(response.data);
-                } catch (e) {
-                    toast.error("An error occurred while fetching pharmacy data", {
-                        position: toast.POSITION.TOP_RIGHT
-                    });
+//            console.log('id', patientObj.visitId);
+//            console.log("pharmacy", response.data);
+            setEditPharmacyOrder(response.data);
+        } catch (e) {
+            toast.error("An error occurred while fetching pharmacy data", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+        }
+    }, []);
+
+    const labtest_by_visitId = useCallback(async () => {
+        try {
+            const response = await axios.get(`${baseUrl}laboratory/orders-by-visit-id/${patientObj.visitId}`,
+            { headers: {"Authorization" : `Bearer ${token}`}});
+
+            const labTests = [];
+            console.log('lab order', response.data);
+            for (const lab of response.data) {
+
+                for (const data of lab.tests) {
+                    let labId = data.id;
+                    let labTestDesc = data.description;
+                    let labTestGroup = data.labTestGroupId;
+                    let labTestId = data.labTestId;
+                    let orderPriority = data.orderPriority;
+                    let labTestOrderStatus = data.labTestOrderStatus;
+
+                    let labdata = {
+                      labOrder: labTestGroup,
+                      labTest: labTestId,
+                      priority: orderPriority,
+                      status: labTestOrderStatus,
+                      id: labId,
+                      orderId: lab.id,
+                      orderDate: lab.orderDate
+                      };
+
+                    labTests.push(labdata)
                 }
-            }, []);
+            }
 
-     const labtest_by_visitId = useCallback(async () => {
-                    try {
-                        const response = await axios.get(`${baseUrl}laboratory/orders-by-visit-id/${patientObj.visitId}`,
-                        { headers: {"Authorization" : `Bearer ${token}`}});
+             setInputFieldsLab(labTests);
+        } catch (e) {
+            toast.error("An error occurred while fetching priority data", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+        }
+    }, []);
 
-                        const labTests = [];
+    let drugRows = null;
+    let dosageUnitsRows = null;
+    let durationUnitsRows = null;
 
-                        for (const lab of response.data) {
+    const loadDosageUnits = useCallback(async () => {
+        try {
+            const response = await axios.get(`${baseUrl}application-codesets/v2/DOSE_STRENGTH_UNIT`,
+            { headers: {"Authorization" : `Bearer ${token}`}});
+            setDosageUnits(response.data);
+        } catch (e) {
+            toast.error("An error occurred while fetching DOSE STRENGTH UNIT", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+        }
+    }, []);
 
-                            for (const data of lab.tests) {
-                                let labTestGroup = data.labTestGroupId;
-                                let labTestId = data.labTestId;
-                                let orderPriority = data.orderPriority;
-                                let labTestOrderStatus = data.labTestOrderStatus;
+    const loadDurationUnits = useCallback(async () => {
+        try {
+            const response = await axios.get(`${baseUrl}application-codesets/v2/AGE_UNIT`,
+            { headers: {"Authorization" : `Bearer ${token}`}});
+            setDurationUnits(response.data);
+        } catch (e) {
+            toast.error("An error occurred while fetching DOSE STRENGTH UNIT", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+        }
+    }, []);
 
-                                let labdata = {
-                                  labOrder: labTestGroup,
-                                  labTest: labTestId,
-                                  priority: orderPriority,
-                                  status: labTestOrderStatus
-                                  };
-
-                                console.log("lab test", labdata);
-                                labTests.push(labdata)
-                            }
-                        }
-
-                         setInputFieldsLab(labTests);
-                    } catch (e) {
-                        toast.error("An error occurred while fetching priority data", {
-                            position: toast.POSITION.TOP_RIGHT
-                        });
-                    }
-                }, []);
+    const loadPharmacyDrugs = useCallback(async () => {
+        try {
+            const response = await axios.get(`${apiUrl}drugs`,
+            { headers: {"Authorization" : `Bearer ${token}`}});
+            setDrugs(response.data);
+        } catch (e) {
+            toast.error("An error occurred while fetching drugs", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+        }
+    }, []);
 
     useEffect(() => {
         loadPharmacyCheck();
@@ -259,8 +342,13 @@ const Widget = (props) => {
         consultations_by_visitId();
         labtest_by_visitId();
         pharmacy_by_visitId();
+        loadDosageUnits();
+        loadDurationUnits();
+        loadPharmacyDrugs();
+        patient_by_Id();
     }, [loadPharmacyCheck, loadLabCheck, loadLatestVitals, loadPreviousConsultation,
-    loadLabGroup, priority, consultations_by_visitId, labtest_by_visitId, pharmacy_by_visitId]);
+    loadLabGroup, priority, consultations_by_visitId, labtest_by_visitId, pharmacy_by_visitId,
+    loadDosageUnits, loadDurationUnits, loadPharmacyDrugs, patient_by_Id]);
 
     const handleAddFields = () => {
         const values = [...inputFields];
@@ -335,9 +423,64 @@ const Widget = (props) => {
             setInputFieldsLab(values);
         };
 
+    const handleInputChangePharmacyOrderDto = (index, e) => {
+        const values = [...editPharmacyOrder];
+        if (e.target.name === "encounterDateTime") {
+            values[index].encounterDateTime = e.target.value;
+        }
+        else if (e.target.name === "drugName") {
+            values[index].drugName = e.target.value;
+        }
+        else if (e.target.name === "dosageStrength") {
+            values[index].dosageStrength = e.target.value;
+        }
+        else if (e.target.name === "dosageStrengthUnit") {
+            values[index].dosageStrengthUnit = e.target.value;
+        }
+        else if (e.target.name === "dosageFrequency") {
+            values[index].dosageFrequency = e.target.value;
+        }
+        else if (e.target.name === "startDate") {
+            values[index].startDate = e.target.value;
+        }
+        else if (e.target.name === "duration") {
+            values[index].duration = e.target.value;
+        }
+        else if (e.target.name === "durationUnit") {
+            values[index].durationUnit = e.target.value;
+        }
+        else if (e.target.name === "comments") {
+            values[index].comments = e.target.value;
+        }
+        else if (e.target.name === "orderedBy") {
+            values[index].orderedBy = e.target.value;
+        }
+        else if (e.target.name === "dateTimePrescribed") {
+            values[index].dateTimePrescribed = e.target.value;
+        }
+        setEditPharmacyOrder(values);
+    };
+
     const handleAddPharmacyOrder = () => {
         setPharmacyModal(!pharmacyModal);
     };
+
+    if (drugs && drugs.length > 0) {
+        //console.log("drugs", drugs);
+        drugRows = drugs.map((drug, index) => (
+            <option key={drug.name} value={drug.name}>{drug.name}</option>
+        ));
+    }
+    if (dosageUnits && dosageUnits.length > 0) {
+        dosageUnitsRows = dosageUnits.map((dosageUnit, index) => (
+            <option key={dosageUnit.display} value={dosageUnit.display}>{dosageUnit.display}</option>
+        ));
+    }
+    if (durationUnits && durationUnits.length > 0) {
+        durationUnitsRows = durationUnits.map((durationUnit, index) => (
+            <option key={durationUnit.display} value={durationUnit.display}>{durationUnit.display}</option>
+        ));
+    }
 
     return (
         <Grid columns='equal'>
@@ -394,7 +537,7 @@ const Widget = (props) => {
                 }
             </Grid.Column>
 
-            <Grid.Column width={9}>
+            <Grid.Column width={10}>
                 <form onSubmit={handleSubmit(onSubmit, OnError)}>
                     <Label as='a' color='black' ribbon>
                         <b>Physical Examination</b>
@@ -429,8 +572,7 @@ const Widget = (props) => {
                             <Controller
                                 name="visitNote"
                                 control={control}
-
-                                rules={{ required: true }}
+                                rules={{ required: false }}
                                 render={({ field: { ref, ...rest }}) => (
                                     <textarea
                                     className="form-control"
@@ -447,10 +589,10 @@ const Widget = (props) => {
                         <Table color="red" celled>
                             <Table.Header>
                                 <Table.Row>
-                                    <Table.HeaderCell>Complaints</Table.HeaderCell>
-                                    <Table.HeaderCell>Onset Date</Table.HeaderCell>
-                                    <Table.HeaderCell>Severity</Table.HeaderCell>
-                                    <Table.HeaderCell>Date Resolved</Table.HeaderCell>
+                                    <Table.Cell style={{ fontWeight: 'bold'}}>Complaints</Table.Cell>
+                                    <Table.Cell style={{ fontWeight: 'bold'}}>Onset Date</Table.Cell>
+                                    <Table.Cell style={{ fontWeight: 'bold'}}>Severity</Table.Cell>
+                                    <Table.Cell style={{ fontWeight: 'bold'}}>Date Resolved</Table.Cell>
                                 </Table.Row>
                             </Table.Header>
 
@@ -534,10 +676,10 @@ const Widget = (props) => {
                         <Table color="pink" celled>
                             <Table.Header>
                                 <Table.Row>
-                                    <Table.HeaderCell>Condition</Table.HeaderCell>
-                                    <Table.HeaderCell>Order</Table.HeaderCell>
-                                    <Table.HeaderCell>Certainty</Table.HeaderCell>
-                                    <Table.HeaderCell></Table.HeaderCell>
+                                    <Table.Cell style={{ fontWeight: 'bold'}}>Condition</Table.Cell>
+                                    <Table.Cell style={{ fontWeight: 'bold'}}>Order</Table.Cell>
+                                    <Table.Cell style={{ fontWeight: 'bold'}}>Certainty</Table.Cell>
+                                    <Table.Cell style={{ fontWeight: 'bold'}}></Table.Cell>
                                 </Table.Row>
                             </Table.Header>
 
@@ -607,10 +749,10 @@ const Widget = (props) => {
                             <Table color="teal" celled>
                                 <Table.Header>
                                     <Table.Row>
-                                        <Table.HeaderCell>Lab Test Group</Table.HeaderCell>
-                                        <Table.HeaderCell>Lab Test</Table.HeaderCell>
-                                        <Table.HeaderCell>Priority</Table.HeaderCell>
-                                        <Table.HeaderCell>Status</Table.HeaderCell>
+                                        <Table.Cell style={{ fontWeight: 'bold'}}>Lab Test Group</Table.Cell>
+                                        <Table.Cell style={{ fontWeight: 'bold'}}>Lab Test</Table.Cell>
+                                        <Table.Cell style={{ fontWeight: 'bold'}}>Priority</Table.Cell>
+                                        <Table.Cell style={{ fontWeight: 'bold'}}>Status</Table.Cell>
                                     </Table.Row>
                                 </Table.Header>
 
@@ -711,18 +853,141 @@ const Widget = (props) => {
                         </Label>
                         <br/>
                         <br/>
-                        { isPharmacyEnabled &&
-                            <div>
-                                <ButtonMui
-                                    variant="contained"
-                                    color="primary"
-                                    className="ms-2"
-                                    onClick={() => handleAddPharmacyOrder()}
-                                >
-                                    <span style={{ textTransform: "capitalize" }}>Add Pharmacy Order</span>
-                                </ButtonMui>
-                            </div>
-                        }
+
+                           {   editPharmacyOrder.length > 0 ?
+                               editPharmacyOrder.map((d, index)=> (
+                                  <Fragment key={index}>
+                                      <div className="row">
+                                          <div className="col-md-6">
+                                                <Input
+                                                   label="Order Date"
+                                                   type="date"
+                                                   name="encounterDateTime"
+                                                   id="encounterDateTime"
+                                                   fluid
+                                                   onChange={e => handleInputChangePharmacyOrderDto(index, e)}
+                                                   value={d.encounterDateTime.substring(0,10)}
+                                               />
+                                          </div>
+                                          <div className="col-md-6">
+                                              <select
+                                                  label="Drug Name"
+                                                  className="ui fluid selection dropdown"
+                                                  onChange={e => handleInputChangePharmacyOrderDto(index, e)}
+                                                  value={d.drugName}
+                                                  name="drugName"
+                                                  id="drugName">
+                                                  <option></option>
+                                                  {drugRows}
+                                              </select>
+                                          </div>
+                                     </div>
+                                     <br />
+                                     <div className="row">
+                                        <div className="col-md-6">
+                                             <Input
+                                                 label="Dosage Strength"
+                                                 type="text"
+                                                 name="dosageStrength"
+                                                 id="dosageStrength"
+                                                 fluid
+                                                 onChange={e => handleInputChangePharmacyOrderDto(index, e)}
+                                                 value={d.dosageStrength}
+                                             />
+                                        </div>
+                                         <div className="col-md-6">
+                                          <select
+                                              className="ui fluid selection dropdown"
+                                              name="dosageStrengthUnit"
+                                              id="dosageStrengthUnit"
+                                              onChange={e => handleInputChangePharmacyOrderDto(index, e)}
+                                              value={d.dosageStrengthUnit}
+                                              >
+                                              <option></option>
+                                              {dosageUnitsRows}
+                                          </select>
+                                       </div>
+                                     </div>
+                                     <br/>
+                                     <div className="row">
+
+                                         <div className="col-md-6">
+                                           <Input
+                                              label="Drug Brand"
+                                              type="text"
+                                              name="brand"
+                                              id="brand"
+                                              fluid
+                                              onChange={e => handleInputChangePharmacyOrderDto(index, e)}
+                                              value={d.brand}
+                                           />
+                                         </div>
+                                         <div className="col-md-6">
+                                              <Input
+                                                  label="Dosage Frequency"
+                                                  type="text"
+                                                  name="dosageFrequency"
+                                                  id="dosageFrequency"
+                                                  fluid
+                                                  onChange={e => handleInputChangePharmacyOrderDto(index, e)}
+                                                  value={d.dosageFrequency}
+                                              />
+                                         </div>
+                                    </div>
+                                    <br/>
+                                       <div className="row">
+                                           <div className="col-md-4">
+                                                <Input
+                                                    label="Start Date"
+                                                    type="date"
+                                                    name="startDate"
+                                                    id="startDate"
+                                                    fluid
+                                                    onChange={e => handleInputChangePharmacyOrderDto(index, e)}
+                                                    value={d.startDate}
+                                                />
+                                           </div>
+                                           <div className="col-md-4">
+                                                 <Input
+                                                    label="Duration"
+                                                    type="text"
+                                                    name="duration"
+                                                    id="duration"
+                                                    fluid
+                                                    onChange={e => handleInputChangePharmacyOrderDto(index, e)}
+                                                    value={d.duration}
+                                                />
+                                           </div>
+                                           <div className="col-md-4">
+                                               <select
+
+                                                     className="ui fluid selection dropdown"
+                                                     name="durationUnit"
+                                                     id="durationUnit"
+                                                     onChange={e => handleInputChangePharmacyOrderDto(index, e)}
+                                                     value={d.durationUnit}
+                                                     >
+                                                     <option></option>
+                                                     {durationUnitsRows}
+                                                 </select>
+                                           </div>
+                                      </div>
+                                      <br/>
+                                      <div className="row">
+                                       <Input
+                                             label="Comments"
+                                             type="text"
+                                             name="comments"
+                                             id="comments"
+                                             onChange={e => handleInputChangePharmacyOrderDto(index, e)}
+                                             value={d.comments}
+                                         />
+                                     </div>
+                                     <hr/>
+                                     </Fragment>
+                                  )) : "No pharmacy order for patient."
+                           }
+
                     </Segment>
                     <Button type={"submit"} variant="contained" color={"primary"}>Submit</Button>
                 </form>
@@ -733,12 +998,12 @@ const Widget = (props) => {
                   <List.Item>
                       <Link
                           to={{
-                              pathname: "/patient-consultations-history",
+                              pathname: "/",
                               state: { patientObj: patientObj  }
                           }}>
                           <Button icon labelPosition='right' color='green' fluid>
-                              <Icon name='eye' />
-                              View History
+                              <Icon name='angle double left' />
+                              Back
                           </Button>
                       </Link>
                   </List.Item>
@@ -775,7 +1040,6 @@ const Widget = (props) => {
                 }
             </Segment>
           </Grid.Column>
-            <AddPharmacyOrder toggle={toggle} patientObj={patientObj} showModal={pharmacyModal} />
         </Grid>
     );
   };

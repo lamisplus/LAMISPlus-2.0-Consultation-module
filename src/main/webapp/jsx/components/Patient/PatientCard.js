@@ -15,6 +15,7 @@ import { Col, Row } from "reactstrap";
 import Moment from "moment";
 import moment from "moment";
 import PostPatient from './PostPatient'
+import { Link } from 'react-router-dom'
 
 const styles = theme => ({
   root: {
@@ -52,8 +53,6 @@ const styles = theme => ({
 });
 
 function PatientCard(props) {
-console.log("props", props);
-
   const { classes } = props;
   const patientObjs = props.patientObj ? props.patientObj : {}
   const [patientObj, setpatientObj] = useState(patientObjs)
@@ -172,6 +171,9 @@ console.log("props", props);
                     </Col>
                     <div className="float-end">
                       {" "}<Button secondary floated='right'  onClick={() => PostPatientService(patientObj)}>Post Patient</Button>
+                      <Link to={"/"} >
+                       <Button primary floated='right'>Back</Button>
+                      </Link>
                     </div>
                 </Row>
             
