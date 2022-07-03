@@ -108,10 +108,10 @@ const Widget = (props) => {
 
             console.log("lb", labOrder)
 
-            axios.put(`${baseUrl}laboratory/orders/${inputFieldsLab[0].orderId}`, labOrder,
-            { headers: {"Authorization" : `Bearer ${token}`} }).then(( resp ) => {
-               console.log("lab updated successfully", resp)
-            });
+//            axios.put(`${baseUrl}laboratory/orders/${inputFieldsLab[0].orderId}`, labOrder,
+//            { headers: {"Authorization" : `Bearer ${token}`} }).then(( resp ) => {
+//               console.log("lab updated successfully", resp)
+//            });
 
             for (const pharm of editPharmacyOrder) {
                 console.log("pharmdata", pharm)
@@ -121,11 +121,11 @@ const Widget = (props) => {
                         console.log("drug updated successfully", resp );
                     });
             }
-//
-//            toast.success("Successfully updated Consultation !", {
-//                position: toast.POSITION.TOP_RIGHT
-//            });
-//           history.push('/patient-consultations-history');
+
+            toast.success("Successfully updated patient consultation !", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+           history.push('/');
 
         } catch (e) {
             toast.error("An error occured while saving Consultation !", {
@@ -243,8 +243,8 @@ const Widget = (props) => {
             const response = await axios.get(`${apiUrl}drug-orders/visits/${patientObj.visitId}`,
             { headers: {"Authorization" : `Bearer ${token}`}});
 
-//            console.log('id', patientObj.visitId);
-//            console.log("pharmacy", response.data);
+            console.log('id', patientObj.visitId);
+          console.log("pharmacy", response.data);
             setEditPharmacyOrder(response.data);
         } catch (e) {
             toast.error("An error occurred while fetching pharmacy data", {
