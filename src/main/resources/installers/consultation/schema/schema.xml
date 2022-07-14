@@ -4,8 +4,10 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-    <changeSet id="20220424173405-0002" author="kennedy">
-        <preConditions onFail="HALT">
+    <property name="autoIncrement" value="true"/>
+
+    <changeSet id="202206010000000-0002" author="kennedy">
+        <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM information_schema.tables WHERE table_name = 'consultation';
             </sqlCheck>
