@@ -36,7 +36,7 @@ const Widget = (props) => {
     const [dosageUnits, setDosageUnits] = useState([]);
     const [durationUnits, setDurationUnits] = useState([]);
     const [editPharmacyOrder, setEditPharmacyOrder] = useState({
-        encounterDateTime: format(new Date(), 'yyyy-MM-dd'),
+        encounterDateTime: "",
         drugName: "",
         dosageStrength: "",
         dosageStrengthUnit: "",
@@ -822,10 +822,12 @@ const Widget = (props) => {
                                                         name="status"
                                                         id="status">
                                                         <option></option>
-                                                        <option value="0">Pending</option>
-                                                        <option value="1">Collected</option>
-                                                        <option value="2">Verified</option>
-                                                        <option value="3">Ready</option>
+                                                          <option value="0">Pending Collection</option>
+                                                            <option value="1">Sample Collected</option>
+                                                            <option value="2">Sample Transferred</option>
+                                                            <option value="3">Sample Verified</option>
+                                                            <option value="4">Sample Rejected</option>
+                                                            <option value="5">Result Available</option>
 
                                                     </select>
                                                 </Table.Cell>

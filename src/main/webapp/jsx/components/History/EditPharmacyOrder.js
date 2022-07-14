@@ -57,49 +57,52 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const AddPharmacyOrder = (props) => {
+const EditPharmacyOrder = (props) => {
     const patientObj = props.patientObj;
+    const pharmacyOrder = props.editPharmacyOrderValue;
     const [saving, setSaving] = useState(false);
     const classes = useStyles();
     const [drugs, setDrugs] = useState([]);
     const [dosageUnits, setDosageUnits] = useState([]);
     const [durationUnits, setDurationUnits] = useState([]);
 
-    const [pharmacyOrder, setPharmacyOrder] = useState({
-        encounterDateTime: format(new Date(), 'yyyy-MM-dd'),
-        drugName: "",
-        dosageStrength: "",
-        dosageStrengthUnit: "",
-        dosageFrequency: "",
-        startDate: "",
-        duration: "",
-        durationUnit: "",
-        comments: "",
-        patientId: patientObj.id,
-        orderedBy: "",
-        dateTimePrescribed: "",
-        visitId: patientObj.visitId
-    });
+    const [pharmacyOrderEdit, setPharmacyOrderEdit] = useState({
+       encounterDateTime: "",
+       drugName: "",
+       dosageStrength: "",
+       dosageStrengthUnit: "",
+       dosageFrequency: "",
+       startDate: "",
+       duration: "",
+       durationUnit: "",
+       comments: "",
+       patientId: patientObj.id,
+       orderedBy: "",
+       dateTimePrescribed: "",
+       visitId: patientObj.visitId
+   });
 
     const handleInputChangePharmacyOrderDto = e => {
-        setPharmacyOrder({...pharmacyOrder, [e.target.name]: e.target.value});
+        console.log(e)
+        setPharmacyOrderEdit({...pharmacyOrderEdit, [e.target.name]: e.target.value});
     };
 
     const handleSubmit = async (e) => {
         try {
             e.preventDefault();
             setSaving(true);
-            pharmacyOrder.encounterDateTime = format(new Date(), 'yyyy-MM-dd@hh:mm:ss');
-            pharmacyOrder.dateTimePrescribed = format(new Date(), 'yyyy-MM-dd@hh:mm:ss');
 
             console.log(pharmacyOrder)
-            await axios.post(`${apiUrl}drug-orders`, { "drugOrders": [pharmacyOrder] },
-            { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
-            console.log("drug saved");
-             toast.success("Successfully Saved drug order!", {
-                            position: toast.POSITION.TOP_RIGHT
-                        });
-            });
+
+//            axios.put(`${apiUrl}drug-orders/${pharmacyOrder.id}`, pharmacyOrder,
+//            { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
+//                console.log("drug updated successfully", resp );
+//                 toast.success("Successfully Saved drug order!", {
+//                    position: toast.POSITION.TOP_RIGHT
+//                });
+//            });
+//
+
             setSaving(false);
             props.toggle()
         } catch (e) {
@@ -175,7 +178,7 @@ const AddPharmacyOrder = (props) => {
         <div>
             <Modal show={props.showModal} toggle={props.toggle} className="fade" size="lg">
                 <Modal.Header toggle={props.toggle} style={{backgroundColor:"#eeeeee"}}>
-                    Drug Prescription
+                    Edit Drug Prescription
                     <Button
                         variant=""
                         className="btn-close"
@@ -196,7 +199,7 @@ const AddPharmacyOrder = (props) => {
                                                     name="encounterDateTime"
                                                     id="encounterDateTime"
                                                     onChange={handleInputChangePharmacyOrderDto}
-                                                    value={pharmacyOrder.encounterDateTime}
+                                                    value={pharmacyOrder.encounterDateTime.substring(0,10)}
                                                 />
                                             </InputGroup>
 
@@ -372,7 +375,7 @@ const AddPharmacyOrder = (props) => {
                                     onClick={handleSubmit}
                                 >
                                     {!saving ? (
-                                        <span style={{ textTransform: "capitalize" }}>Save</span>
+                                        <span style={{ textTransform: "capitalize" }}>Update</span>
                                     ) : (
                                         <span style={{ textTransform: "capitalize" }}>Saving...</span>
                                     )}
@@ -396,4 +399,4 @@ const AddPharmacyOrder = (props) => {
     );
 };
 
-export default AddPharmacyOrder;
+export default EditPharmacyOrder;

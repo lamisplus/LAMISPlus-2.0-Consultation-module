@@ -12,6 +12,7 @@ import {format} from "date-fns";
 import { Link, useHistory } from 'react-router-dom';
 import ButtonMui from "@material-ui/core/Button";
 import AddPharmacyOrder from './AddPharmacyOrder';
+import EditPharmacyOrder from './EditPharmacyOrder';
 
 const Widget = (props) => {
     const patientObj = props.patientObj ? props.patientObj : {}
@@ -19,6 +20,7 @@ const Widget = (props) => {
     const [isPharmacyEnabled, setIsPharmacyEnabled] = useState(false);
     const [hasAllergies, setHasAllergies] = useState(false);
     const [pharmacyModal, setPharmacyModal] = useState(false);
+    const [pharmacyOrderModal, setPharmacyOrderModal] = useState(false);
     const [latestVitals, setLatestVitals] = useState([]);
     const [previousConsultation, setPreviousConsultation] = useState([]);
     const [encounterDate, setEncounterDate] = useState(new Date());
@@ -37,6 +39,35 @@ const Widget = (props) => {
 
     const history = useHistory();
     const toggle = () => setPharmacyModal(!pharmacyModal);
+    const toggleOrder = () => setPharmacyOrderModal(!pharmacyOrderModal);
+    const [pharmacyOrder, setPharmacyOrder] = useState([]);
+    const [editPharmacyOrderValue, setEditPharmacyOrderValue] = useState({
+        encounterDateTime: "",
+        drugName: "",
+        dosageStrength: "",
+        dosageStrengthUnit: "",
+        dosageFrequency: "",
+        startDate: "",
+        duration: "",
+        durationUnit: "",
+        comments: "",
+        patientId: patientObj.id,
+        orderedBy: "",
+        dateTimePrescribed: "",
+        visitId: patientObj.visitId
+    });
+
+    const pharmacy_by_visitId = useCallback(async () => {
+            try {
+                const response = await axios.get(`${apiUrl}drug-orders/visits/${patientObj.visitId}`,
+                { headers: {"Authorization" : `Bearer ${token}`}});
+                setPharmacyOrder(response.data);
+            } catch (e) {
+                toast.error("An error occurred while fetching pharmacy data", {
+                    position: toast.POSITION.TOP_RIGHT
+                });
+            }
+        }, []);
 
     const onSubmit = async (data) => {
         const diagnosisList = [];
@@ -195,7 +226,9 @@ const Widget = (props) => {
         loadPreviousConsultation();
         loadLabGroup();
         priority();
-    }, [loadPharmacyCheck, loadLabCheck, loadLatestVitals, loadPreviousConsultation, loadLabGroup, priority]);
+        pharmacy_by_visitId();
+    }, [loadPharmacyCheck, loadLabCheck, loadLatestVitals,
+    loadPreviousConsultation, loadLabGroup, priority, pharmacy_by_visitId]);
 
     const handleAddFields = () => {
         const values = [...inputFields];
@@ -274,6 +307,23 @@ const Widget = (props) => {
         setPharmacyModal(!pharmacyModal);
     };
 
+     const handleEditPharmacyOrder = (pharmacy) => {
+            console.log(pharmacy);
+            setEditPharmacyOrderValue(pharmacy);
+            setPharmacyOrderModal(!pharmacyOrderModal);
+     };
+
+     const handleDelete = async (id) => {
+        console.log(id)
+           await axios.delete(`${apiUrl}drug-orders/${id}`,
+            { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
+            console.log("drug order deleted");
+             toast.success("Successfully deleted drug order!", {
+                    position: toast.POSITION.TOP_RIGHT
+                });
+            });
+     }
+
     return (
         <Grid columns='equal'>
             <Grid.Column>
@@ -328,7 +378,7 @@ const Widget = (props) => {
                 }
             </Grid.Column>
 
-            <Grid.Column width={10}>
+            <Grid.Column width={9}>
                 <form onSubmit={handleSubmit(onSubmit, OnError)}>
                     <Label as='a' color='black' ribbon>
                         <b>Physical Examination</b>
@@ -416,6 +466,7 @@ const Widget = (props) => {
                                                     onChange={event => handleInputChange(index, event)}
                                                     name="severity"
                                                     id="severity">
+                                                    <option>Select</option>
                                                     <option value="0">0</option>
                                                     <option value="1">1</option>
                                                     <option value="2">2</option>
@@ -492,7 +543,7 @@ const Widget = (props) => {
                                                     onChange={event => handleInputDiagChange(diagIndex, event)}
                                                     name="diagnosisOrder"
                                                     id="diagnosisOrder">
-                                                    <option></option>
+                                                    <option>Select</option>
                                                     <option value="1">Primary</option>
                                                     <option value="2">Secondary</option>
                                                 </select>
@@ -504,7 +555,7 @@ const Widget = (props) => {
                                                     onChange={event => handleInputDiagChange(diagIndex, event)}
                                                     name="certainty"
                                                     id="certainty">
-                                                    <option></option>
+                                                    <option>Select</option>
                                                     <option value="1">Presumed</option>
                                                     <option value="2">Confirmed</option>
                                                 </select>
@@ -554,7 +605,7 @@ const Widget = (props) => {
                                                         onChange={ e => handleInputLabChange(labIndex, e)}
                                                         name="labOrder"
                                                         id="labOrder">
-                                                        <option></option>
+                                                        <option>Select</option>
                                                         {
                                                             labGroups.map((d)=> (
                                                                 <option key={d.id} value={`${d.id}-${d.groupName}`}>
@@ -572,7 +623,7 @@ const Widget = (props) => {
                                                         onChange={e => handleInputLabChange(labIndex, e)}
                                                         name="labTest"
                                                         id="labTest">
-                                                        <option></option>
+                                                        <option>Select</option>
                                                              {
                                                                 labTests.map((d)=> (
                                                                     <option key={d.id} value={d.id}>
@@ -590,7 +641,7 @@ const Widget = (props) => {
                                                     onChange={e => handleInputLabChange(labIndex, e)}
                                                     name="priority"
                                                     id="priority">
-                                                    <option></option>
+                                                    <option>Select</option>
                                                        {
                                                             priorities.map((d)=> (
                                                                 <option key={d.id} value={d.id}>
@@ -608,12 +659,13 @@ const Widget = (props) => {
                                                         onChange={e => handleInputLabChange(labIndex, e)}
                                                         name="status"
                                                         id="status">
-                                                        <option></option>
-                                                        <option value="0">Pending</option>
-                                                        <option value="1">Collected</option>
-                                                        <option value="2">Verified</option>
-                                                        <option value="3">Ready</option>
-
+                                                        <option>Select</option>
+                                                        <option value="0">Pending Collection</option>
+                                                        <option value="1">Sample Collected</option>
+                                                        <option value="2">Sample Transferred</option>
+                                                        <option value="3">Sample Verified</option>
+                                                        <option value="4">Sample Rejected</option>
+                                                        <option value="5">Result Available</option>
                                                     </select>
                                                 </Table.Cell>
                                             </Table.Row>
@@ -639,6 +691,30 @@ const Widget = (props) => {
                             Pharmacy Order
                         </Label>
                         <br/>
+                        <br/>
+                        <>
+                        {
+                           pharmacyOrder !== null ? pharmacyOrder.map((pharmacy, i) => (
+                            <div className="page-header" key={i}>
+                                  <p><b>{pharmacy.drugName}</b>
+                                  <br /> Start at {pharmacy.startDate} for {pharmacy.dosageFrequency} to be taken {pharmacy.duration} time(s) a day
+                                  <br />
+                                  Instructions: {pharmacy.comments}  <br />
+                                  Date Ordered: {pharmacy.dateTimePrescribed}</p>
+                                  <p>
+                                    <Label as='a' color="orange" size="tiny" onClick={() => handleEditPharmacyOrder(pharmacy)}>
+                                    <Icon name='edit' /> Edit</Label>
+                                    {" "}
+                                    <Label as='a' color="red" size="tiny" onClick={() => handleDelete(pharmacy.id)}>
+                                                                    <Icon name='delete' /> Delete</Label>
+                                  </p>
+                                  <br/>
+                            </div>
+                            )) :
+                            <p>No pharmacy record for this patient</p>
+                        }
+
+                        </>
                         <br/>
                         { isPharmacyEnabled &&
                             <div>
@@ -705,6 +781,8 @@ const Widget = (props) => {
             </Segment>
           </Grid.Column>
             <AddPharmacyOrder toggle={toggle} patientObj={patientObj} showModal={pharmacyModal} />
+            <EditPharmacyOrder toggle={toggleOrder} patientObj={patientObj}
+             showModal={pharmacyOrderModal} editPharmacyOrderValue={editPharmacyOrderValue}/>
         </Grid>
     );
   };
