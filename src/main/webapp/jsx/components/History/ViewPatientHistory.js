@@ -6,7 +6,6 @@ import axios from "axios";
 import { toast } from 'react-toastify';
 import {token, url as baseUrl, apiUrl as apiUrl } from "../../../api";
 import { Grid, Segment, Label, Icon, List,Button, Card, Feed, Input, Radio } from 'semantic-ui-react';
-// Page titie
 import {  Checkbox, Table } from 'semantic-ui-react';
 import {format} from "date-fns";
 import { Link, useHistory } from 'react-router-dom';
@@ -15,7 +14,7 @@ import ButtonMui from "@material-ui/core/Button";
 const Widget = (props) => {
     let history = useHistory();
     const patientObj = history.location && history.location.state ? history.location.state.patientObj : {}
-    //console.log("vist", patientObj)
+    //console.log("pb",patientObj)
     const [patient, setPatient] = useState({});
     const [isLabEnabled, setIsLabEnabled] = useState(false);
     const [isPharmacyEnabled, setIsPharmacyEnabled] = useState(false);
@@ -45,7 +44,6 @@ const Widget = (props) => {
         duration: "",
         durationUnit: "",
         comments: "",
-        //patientId: patientObj.id,
         orderedBy: "",
         dateTimePrescribed: ""
     });
@@ -81,12 +79,12 @@ const Widget = (props) => {
             };
 
             await axios.put(`${baseUrl}consultations/${patientObj.id}`, InData,
-            { headers: {"Authorization" : `Bearer ${token}`} }).then(( resp ) =>{
+            { headers: {"Authorization" : `Bearer ${token}`} }).then(( resp ) => {
                 console.log("diagnosis updated successfully", resp)
             });
 
             for (const inputField of inputFieldsLab) {
-
+            //console.log("input",inputField)
                 if (inputField.id) {
                     labTests.push({
                     "id": inputField.id,
@@ -101,28 +99,26 @@ const Widget = (props) => {
             const labOrder = {
                   "id": inputFieldsLab[0].id,
                   "orderDate": inputFieldsLab[0].orderDate,
-                  "patientId": patientObj.id,
+                  "patientId": patientObj.patientId,
                   "tests": labTests,
                   "visitId": patientObj.visitId
             }
 
             console.log("lb", labOrder)
 
-//            axios.put(`${baseUrl}laboratory/orders/${inputFieldsLab[0].orderId}`, labOrder,
-//            { headers: {"Authorization" : `Bearer ${token}`} }).then(( resp ) => {
-//               console.log("lab updated successfully", resp)
-//            });
+            axios.put(`${baseUrl}laboratory/orders/${inputFieldsLab[0].orderId}`, labOrder,
+            { headers: {"Authorization" : `Bearer ${token}`} }).then(( resp ) => {
+               console.log("lab updated successfully", resp)
+                for (const pharm of editPharmacyOrder) {
+                    console.log("pharm", pharm)
+                    axios.put(`${apiUrl}drug-orders/${pharm.id}`, pharm,
+                       { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
+                           console.log("drug updated successfully", resp );
+                       });
+               }
+            });
 
-            for (const pharm of editPharmacyOrder) {
-                console.log("pharmdata", pharm)
-
-                 axios.put(`${apiUrl}drug-orders/${pharm.id}`, pharm,
-                    { headers: {"Authorization" : `Bearer ${token}`}}).then(resp => {
-                        console.log("drug updated successfully", resp );
-                    });
-            }
-
-            toast.success("Successfully updated patient consultation !", {
+            toast.success("Successfully updated patient consultation!", {
                 position: toast.POSITION.TOP_RIGHT
             });
            history.push('/');
@@ -144,19 +140,6 @@ const Widget = (props) => {
     const [labGroups, setLabGroups] = useState([]);
     const [labTests, setLabTests] = useState([]);
     const [priorities, setPriorities] = useState([]);
-
-    const patient_by_Id = useCallback(async () => {
-        try {
-            const response = await axios.get(`${baseUrl}patient/${patientObj.patientId}`,
-            { headers: {"Authorization" : `Bearer ${token}`}});
-           // console.log("patient", response.data);
-            //setPriorities(response.data);
-        } catch (e) {
-            toast.error("An error occurred while fetching priority data", {
-                position: toast.POSITION.TOP_RIGHT
-            });
-        }
-    }, []);
 
     const loadLabCheck = useCallback(async () => {
         try {
@@ -191,17 +174,6 @@ const Widget = (props) => {
         }
     }, []);
 
-    const loadPreviousConsultation = useCallback(async () => {
-        try {
-            //const response = await axios.get(`${baseUrl}consultations/consultations-by-patient-id/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`}});
-            setPreviousConsultation([]);
-        } catch (e) {
-            toast.error("An error occurred while fetching previous consultation", {
-                position: toast.POSITION.TOP_RIGHT
-            });
-        }
-    }, []);
-
     const loadLabGroup = useCallback(async () => {
             try {
                 const response = await axios.get(`${baseUrl}laboratory/labtestgroups`, { headers: {"Authorization" : `Bearer ${token}`}});
@@ -225,27 +197,16 @@ const Widget = (props) => {
             }
         }, []);
 
-    const consultations_by_visitId = useCallback(async () => {
-            try {
-                const response = await axios.get(`${baseUrl}consultations/consultations-by-visit-id/${patientObj.visitId}`,
-                { headers: {"Authorization" : `Bearer ${token}`}});
-                //console.log("consult", response.data);
-                //setPriorities(response.data);
-            } catch (e) {
-                toast.error("An error occurred while fetching priority data", {
-                    position: toast.POSITION.TOP_RIGHT
-                });
-            }
-        }, []);
-
     const pharmacy_by_visitId = useCallback(async () => {
         try {
             const response = await axios.get(`${apiUrl}drug-orders/visits/${patientObj.visitId}`,
             { headers: {"Authorization" : `Bearer ${token}`}});
 
-            console.log('id', patientObj.visitId);
-          console.log("pharmacy", response.data);
-            setEditPharmacyOrder(response.data);
+            if (typeof response.data === 'string') {
+                setEditPharmacyOrder([]);
+            }else {
+                setEditPharmacyOrder(response.data);
+            }
         } catch (e) {
             toast.error("An error occurred while fetching pharmacy data", {
                 position: toast.POSITION.TOP_RIGHT
@@ -255,14 +216,14 @@ const Widget = (props) => {
 
     const labtest_by_visitId = useCallback(async () => {
         try {
-            const response = await axios.get(`${baseUrl}laboratory/orders-by-visit-id/${patientObj.visitId}`,
+            const response = await axios.get(`${baseUrl}laboratory/orders/visits/${patientObj.visitId}`,
             { headers: {"Authorization" : `Bearer ${token}`}});
 
             const labTests = [];
-            console.log('lab order', response.data);
+
             for (const lab of response.data) {
 
-                for (const data of lab.tests) {
+                for (const data of lab.labOrder.tests) {
                     let labId = data.id;
                     let labTestDesc = data.description;
                     let labTestGroup = data.labTestGroupId;
@@ -276,8 +237,8 @@ const Widget = (props) => {
                       priority: orderPriority,
                       status: labTestOrderStatus,
                       id: labId,
-                      orderId: lab.id,
-                      orderDate: lab.orderDate
+                      orderId: lab.labOrder.id,
+                      orderDate: lab.labOrder.orderDate
                       };
 
                     labTests.push(labdata)
@@ -286,7 +247,7 @@ const Widget = (props) => {
 
              setInputFieldsLab(labTests);
         } catch (e) {
-            toast.error("An error occurred while fetching priority data", {
+            toast.error("An error occurred while fetching lab tests order data", {
                 position: toast.POSITION.TOP_RIGHT
             });
         }
@@ -336,19 +297,16 @@ const Widget = (props) => {
         loadPharmacyCheck();
         loadLabCheck();
         loadLatestVitals();
-        loadPreviousConsultation();
         loadLabGroup();
         priority();
-        consultations_by_visitId();
         labtest_by_visitId();
         pharmacy_by_visitId();
         loadDosageUnits();
         loadDurationUnits();
         loadPharmacyDrugs();
-        patient_by_Id();
-    }, [loadPharmacyCheck, loadLabCheck, loadLatestVitals, loadPreviousConsultation,
-    loadLabGroup, priority, consultations_by_visitId, labtest_by_visitId, pharmacy_by_visitId,
-    loadDosageUnits, loadDurationUnits, loadPharmacyDrugs, patient_by_Id]);
+    }, [loadPharmacyCheck, loadLabCheck, loadLatestVitals,
+    loadLabGroup, priority, labtest_by_visitId, pharmacy_by_visitId,
+    loadDosageUnits, loadDurationUnits, loadPharmacyDrugs]);
 
     const handleAddFields = () => {
         const values = [...inputFields];
@@ -379,7 +337,6 @@ const Widget = (props) => {
         } else if (event.target.name === "dateResolved") {
             values[index].dateResolved = event.target.value;
         }
-
         setInputFields(values);
     };
 
@@ -392,7 +349,6 @@ const Widget = (props) => {
         } else if (event.target.name === "diagnosisOrder") {
             values[index].diagnosisOrder = event.target.value;
         }
-
         setInputFieldsDiagnosis(values);
     };
 
@@ -466,7 +422,6 @@ const Widget = (props) => {
     };
 
     if (drugs && drugs.length > 0) {
-        //console.log("drugs", drugs);
         drugRows = drugs.map((drug, index) => (
             <option key={drug.name} value={drug.name}>{drug.name}</option>
         ));
@@ -597,7 +552,7 @@ const Widget = (props) => {
                             </Table.Header>
 
                             <Table.Body>
-                                    {inputFields.map((inputField, index) => (
+                                    {inputFields && inputFields.map((inputField, index) => (
                                         <Fragment key={`${inputField}~${index}`}>
                                             <Table.Row>
                                             <Table.Cell>
@@ -684,7 +639,7 @@ const Widget = (props) => {
                             </Table.Header>
 
                             <Table.Body>
-                                {inputFieldsDiagnosis.map((diagInputField, diagIndex) => (
+                                {inputFieldsDiagnosis && inputFieldsDiagnosis.map((diagInputField, diagIndex) => (
                                     <Fragment key={`${diagInputField}~${diagIndex}`}>
                                         <Table.Row>
                                             <Table.Cell>
@@ -757,7 +712,7 @@ const Widget = (props) => {
                                 </Table.Header>
 
                                 <Table.Body>
-                                   {inputFieldsLab.map((labInputField, labIndex) => (
+                                   {inputFieldsLab && inputFieldsLab.map((labInputField, labIndex) => (
                                         <Fragment key={`${labInputField}~${labIndex}`}>
                                             <Table.Row>
                                                 <Table.Cell>

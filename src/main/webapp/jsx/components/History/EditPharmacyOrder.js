@@ -178,7 +178,7 @@ const EditPharmacyOrder = (props) => {
         <div>
             <Modal show={props.showModal} toggle={props.toggle} className="fade" size="lg">
                 <Modal.Header toggle={props.toggle} style={{backgroundColor:"#eeeeee"}}>
-                    Edit Drug Prescription
+                    Patient Drug Prescription
                     <Button
                         variant=""
                         className="btn-close"
@@ -366,7 +366,7 @@ const EditPharmacyOrder = (props) => {
                                 {saving ? <Spinner /> : ""}
                                 <br />
 
-                                <MatButton
+                               {/* <MatButton
                                     type="submit"
                                     variant="contained"
                                     color="primary"
@@ -379,7 +379,7 @@ const EditPharmacyOrder = (props) => {
                                     ) : (
                                         <span style={{ textTransform: "capitalize" }}>Saving...</span>
                                     )}
-                                </MatButton>
+                                </MatButton>*/}
 
                                 <MatButton
                                     variant="contained"

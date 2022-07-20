@@ -55,6 +55,7 @@ const styles = theme => ({
 function PatientCard(props) {
   const { classes } = props;
   const patientObjs = props.patientObj ? props.patientObj : {}
+  console.log(patientObjs)
   const [patientObj, setpatientObj] = useState(patientObjs)
   const [modal, setModal] = useState(false);
   const toggle = () => setModal(!modal);

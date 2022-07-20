@@ -16,6 +16,7 @@ import EditPharmacyOrder from './EditPharmacyOrder';
 
 const Widget = (props) => {
     const patientObj = props.patientObj ? props.patientObj : {}
+    //console.log("po", patientObj)
     const [isLabEnabled, setIsLabEnabled] = useState(false);
     const [isPharmacyEnabled, setIsPharmacyEnabled] = useState(false);
     const [hasAllergies, setHasAllergies] = useState(false);
@@ -61,7 +62,16 @@ const Widget = (props) => {
             try {
                 const response = await axios.get(`${apiUrl}drug-orders/visits/${patientObj.visitId}`,
                 { headers: {"Authorization" : `Bearer ${token}`}});
-                setPharmacyOrder(response.data);
+
+                console.log("red",response.data)
+
+                if (typeof response.data === 'string') {
+                    setPharmacyOrder([]);
+                }else {
+                    setPharmacyOrder(response.data);
+                }
+
+
             } catch (e) {
                 toast.error("An error occurred while fetching pharmacy data", {
                     position: toast.POSITION.TOP_RIGHT
@@ -115,11 +125,12 @@ const Widget = (props) => {
 
             const labOrder = {
                   "orderDate": format(new Date(data.encounterDate.toString()), 'yyyy-MM-dd'),
-                  //"orderTime": new Date().toLocaleTimeString(),
+                  "orderTime": new Date().toLocaleTimeString('en-US',{hour12: false}),
                   "patientId": patientObj.id,
                   "tests": labTests,
                   "visitId": patientObj.visitId
             }
+            //console.log('labOrder', labOrder)
             await axios.post(`${baseUrl}consultations`, InData,
             { headers: {"Authorization" : `Bearer ${token}`} }).then(( resp ) =>{
                 console.log("diagnosis saved", resp)
@@ -127,13 +138,19 @@ const Widget = (props) => {
                 axios.post(`${baseUrl}laboratory/orders`, labOrder,
                 { headers: {"Authorization" : `Bearer ${token}`} }).then(( resp ) =>{
                     console.log("lab served", resp)
-                });
-            });
 
-            toast.success("Successfully Saved Consultation !", {
-                position: toast.POSITION.TOP_RIGHT
+                    toast.success("Successfully Saved Consultation !", {
+                        position: toast.POSITION.TOP_RIGHT
+                    });
+
+                    history.push('/');
+                }).catch((err) => {
+                     toast.error(`An error occured while saving laboratory test! ${err}`, {
+                        position: toast.POSITION.TOP_RIGHT
+                    });
+                });
+
             });
-           history.push('/');
 
         } catch (e) {
             toast.error("An error occured while saving Consultation !", {
@@ -661,11 +678,11 @@ const Widget = (props) => {
                                                         id="status">
                                                         <option>Select</option>
                                                         <option value="0">Pending Collection</option>
-                                                        <option value="1">Sample Collected</option>
+                                                       {/* <option value="1">Sample Collected</option>
                                                         <option value="2">Sample Transferred</option>
                                                         <option value="3">Sample Verified</option>
                                                         <option value="4">Sample Rejected</option>
-                                                        <option value="5">Result Available</option>
+                                                        <option value="5">Result Available</option> */}
                                                     </select>
                                                 </Table.Cell>
                                             </Table.Row>
@@ -694,7 +711,7 @@ const Widget = (props) => {
                         <br/>
                         <>
                         {
-                           pharmacyOrder !== null ? pharmacyOrder.map((pharmacy, i) => (
+                           pharmacyOrder.length > 0 ? pharmacyOrder.map((pharmacy, i) => (
                             <div className="page-header" key={i}>
                                   <p><b>{pharmacy.drugName}</b>
                                   <br /> Start at {pharmacy.startDate} for {pharmacy.dosageFrequency} to be taken {pharmacy.duration} time(s) a day
@@ -702,8 +719,8 @@ const Widget = (props) => {
                                   Instructions: {pharmacy.comments}  <br />
                                   Date Ordered: {pharmacy.dateTimePrescribed}</p>
                                   <p>
-                                    <Label as='a' color="orange" size="tiny" onClick={() => handleEditPharmacyOrder(pharmacy)}>
-                                    <Icon name='edit' /> Edit</Label>
+                                    <Label as='a' color="blue" size="tiny" onClick={() => handleEditPharmacyOrder(pharmacy)}>
+                                    <Icon name='eye' /> View</Label>
                                     {" "}
                                     <Label as='a' color="red" size="tiny" onClick={() => handleDelete(pharmacy.id)}>
                                                                     <Icon name='delete' /> Delete</Label>
@@ -711,7 +728,7 @@ const Widget = (props) => {
                                   <br/>
                             </div>
                             )) :
-                            <p>No pharmacy record for this patient</p>
+                            <p>No previous pharmacy record for this patient</p>
                         }
 
                         </>

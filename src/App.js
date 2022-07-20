@@ -14,6 +14,7 @@ import Home from './main/webapp/jsx/components/Home';
 import PatientDetail from './main/webapp/jsx/components/Patient/PatientDetail';
 import PatientConsultationHistory from './main/webapp/jsx/components/History/PatientConsultationHistory';
 import ViewPatientHistory from './main/webapp/jsx/components/History/ViewPatientHistory'
+//import PatientEditDetail from './main/webapp/jsx/components/Patient/PatientEditDetail';
 
 export default function App() {
   return (
@@ -24,7 +25,7 @@ export default function App() {
             renders the first one that matches the current URL. */}
         <Switch>
          <Route path="/patient-consultation">
-           <ViewPatientHistory/>
+           <ViewPatientHistory />
          </Route>
 
           <Route path="/patient-consultations-history">
