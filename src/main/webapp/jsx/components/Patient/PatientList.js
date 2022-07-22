@@ -29,7 +29,9 @@ import {Menu,MenuList,MenuButton,MenuItem,} from "@reach/menu-button";
 import "@reach/menu-button/styles.css";
 import moment from "moment";
 import {toast} from "react-toastify";
-
+import {MdDeleteForever, MdModeEdit, MdPerson} from "react-icons/md";
+import {FaEye, FaCaretDown } from "react-icons/fa";
+import SplitActionButton from "../../layouts/SplitActionButton";
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -139,6 +141,35 @@ const Patients = (props) => {
         return hospitalNumber ? hospitalNumber.value : '';
     };
 
+
+    function actionItems(row){
+        return  [
+            {
+                type:'single',
+                actions:[
+                    {
+                        name:'Dashboard',
+                        type:'link',
+                        icon:<FaEye  size="22"/>,
+                        to:{
+                            pathname: "/patient-history",
+                            state: { patientObj: row  }
+                        }
+                    },
+                    {
+                        name:'Patient Dashboard',
+                        type:'link',
+                        icon:<MdPerson size="20" color='#014d88' />,
+                        to:{
+                            pathname: "/patient-history",
+                            state: { patientObj: row  }
+                        }
+                    }
+                ]
+            }
+
+        ]
+    }
     //console.log(patientList)
     return (
         <div>
@@ -175,7 +206,8 @@ const Patients = (props) => {
                             actions:
 
                                 <div>
-                                    <Menu>
+                                    <SplitActionButton actions={actionItems(row)} />
+{/*                                    <Menu>
                                         <MenuButton style={{ backgroundColor:"#3F51B5", color:"#fff", border:"2px solid #3F51B5", borderRadius:"4px", }}>
                                             Actions <span aria-hidden>▾</span>
                                         </MenuButton>
@@ -192,15 +224,18 @@ const Patients = (props) => {
                                             </MenuItem>
 
                                         </MenuList>
-                                    </Menu>
+                                    </Menu>*/}
                                 </div>
 
                         }))}
 
                         options={{
                             headerStyle: {
-                                //backgroundColor: "#9F9FA5",
-                                color: "#000",
+                                backgroundColor: "#014d88",
+                                color: "#fff",
+                                fontSize:'16px',
+                                padding:'10px',
+                                fontWeight:'bolder'
                             },
                             searchFieldStyle: {
                                 width : '200%',

@@ -13,8 +13,26 @@ import { Link, useHistory } from 'react-router-dom';
 import ButtonMui from "@material-ui/core/Button";
 import AddPharmacyOrder from './AddPharmacyOrder';
 import EditPharmacyOrder from './EditPharmacyOrder';
+import { makeStyles } from '@material-ui/core/styles';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+        width: '100%',
+    },
+    heading: {
+        fontSize: theme.typography.pxToRem(15),
+        fontWeight: 'bolder',
+    },
+}));
 
 const Widget = (props) => {
+    const classes = useStyles();
     const patientObj = props.patientObj ? props.patientObj : {}
     //console.log("po", patientObj)
     const [isLabEnabled, setIsLabEnabled] = useState(false);
@@ -22,7 +40,7 @@ const Widget = (props) => {
     const [hasAllergies, setHasAllergies] = useState(false);
     const [pharmacyModal, setPharmacyModal] = useState(false);
     const [pharmacyOrderModal, setPharmacyOrderModal] = useState(false);
-    const [latestVitals, setLatestVitals] = useState([]);
+    const [last5Vitals, setlast5Vitals] = useState([]);
     const [previousConsultation, setPreviousConsultation] = useState([]);
     const [encounterDate, setEncounterDate] = useState(new Date());
     const { handleSubmit, control, getValues, setError, setValue } = useForm();
@@ -191,10 +209,10 @@ const Widget = (props) => {
         }
     }, []);
 
-    const loadLatestVitals = useCallback(async () => {
+    const loadPatientVitals = useCallback(async () => {
         try {
             const response = await axios.get(`${baseUrl}patient/vital-sign/person/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`}});
-            setLatestVitals(response.data);
+            setPatientVitals(response.data);
         } catch (e) {
             toast.error("An error occurred while fetching vitals", {
                 position: toast.POSITION.TOP_RIGHT
@@ -239,13 +257,48 @@ const Widget = (props) => {
     useEffect(() => {
         loadPharmacyCheck();
         loadLabCheck();
-        loadLatestVitals();
+        loadPatientVitals();
         loadPreviousConsultation();
         loadLabGroup();
         priority();
         pharmacy_by_visitId();
-    }, [loadPharmacyCheck, loadLabCheck, loadLatestVitals,
+        getLatestVitals();
+    }, [loadPharmacyCheck, loadLabCheck, loadPatientVitals,
     loadPreviousConsultation, loadLabGroup, priority, pharmacy_by_visitId]);
+
+    const [latestVitals, setVitalSignDto]= useState({
+        bodyWeight: "",
+        diastolic: "",
+        encounterDate: "",
+        facilityId: "",
+        height: "",
+        personId:"",
+        pulse: "",
+        respiratoryRate: "",
+        systolic:"",
+        temperature: "",
+        visitId:""
+    })
+    ///GET LIST OF Patients
+    async function getLatestVitals() {
+        axios
+            .get(`${baseUrl}patient/vital-sign/visit/${patientObj.visitId}`,
+                { headers: {"Authorization" : `Bearer ${token}`} }
+            )
+            .then((response) => {
+                console.log('current vitals')
+                setVitalSignDto(response.data);
+                console.log('current vitals')
+/*
+                setBMI(Math.round(response.data.bodyWeight/Math.pow(response.data.height,2)));
+                setVisitVitalStatus(true);
+                setCurrentVitalId(response.data.id)
+                props.setVisitVitalExists(true);*/
+            })
+            .catch((error) => {
+            });
+    }
+
 
     const handleAddFields = () => {
         const values = [...inputFields];
@@ -346,24 +399,63 @@ const Widget = (props) => {
             <Grid.Column>
                 { latestVitals && latestVitals.length > 0 &&
                     <Segment>
-                        <Label as='a' color='blue' ribbon>
-                            Recent Vitals
+{/*                        <Label as='a' color='blue'  style={{width:'100%',marginBottom:'10px'}}>
+                             Vitals
                         </Label>
-                        <br/>
-                        <List celled>
-                            <List.Item>Pulse <span className="float-end"><b>{latestVitals[latestVitals.length - 1].pulse}bpm</b></span></List.Item>
-                            <List.Item>Respiratory Rate <span className="float-end"><b>{latestVitals[latestVitals.length - 1].respiratoryRate}bpm</b></span></List.Item>
-                            <List.Item>Temperature <span className="float-end"><b>{latestVitals[latestVitals.length - 1].temperature}<sup>0</sup>C</b></span></List.Item>
-                            <List.Item>Blood Presure <span  className="float-end"><b>{latestVitals[latestVitals.length - 1].systolic}/{latestVitals[latestVitals.length - 1].diastolic}</b></span></List.Item>
-                            <List.Item>Height <span  className="float-end"><b>{latestVitals[latestVitals.length - 1].height}m</b></span></List.Item>
-                            <List.Item>Weight <span  className="float-end"><b>{latestVitals[latestVitals.length - 1].bodyWeight}kg</b></span></List.Item>
-                        </List>
+                        <br/>*/}
+
+                        <div className={classes.root}>
+                            <Accordion style={{minHeight:'45px',padding:'0px 0px 0px 0px'}} defaultExpanded={true}>
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls="panel1a-content"
+                                    id="panel1a-header"
+                                    style={{padding:'0px 0px 0px 2px',borderBottom:'2px solid #eee'}}
+                                >
+                                    <Label as='a' color='blue'  style={{width:'100%'}}>
+                                        <Typography className={classes.heading}>Current Vitals - Date - 2022-07-20</Typography>
+                                    </Label>
+
+                                </AccordionSummary>
+                                <AccordionDetails style={{padding:'8px'}}>
+                                    <List celled style={{width:'100%'}}>
+                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px',borderTop:'1px solid #fff', marginTop:'-5px' }}>Pulse <span className="float-end"><b>{latestVitals.pulse} bpm</b></span></List.Item>
+                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Respiratory Rate <span className="float-end"><b>{latestVitals.respiratoryRate} bpm</b></span></List.Item>
+                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Temperature <span className="float-end"><b>{latestVitals.temperature} <sup>0</sup>C</b></span></List.Item>
+                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Blood Pressure <span  className="float-end"><b>{latestVitals.systolic}/{latestVitals.diastolic}</b></span></List.Item>
+                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Height <span  className="float-end"><b>{latestVitals.height} cm</b></span></List.Item>
+                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Weight <span  className="float-end"><b>{latestVitals.bodyWeight} kg</b></span></List.Item>
+                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>BMI <span  className="float-end"><b>{latestVitals.bodyWeight} kg</b></span></List.Item>
+                                    </List>
+                                </AccordionDetails>
+                            </Accordion>
+                            <Accordion>
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls="panel2a-content"
+                                    id="panel2a-header"
+                                    style={{padding:'0px 0px 0px 10px'}}
+                                >
+                                    <Typography className={classes.heading}>Accordion 2</Typography>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <Typography>
+                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
+                                        sit amet blandit leo lobortis eget.
+                                    </Typography>
+                                </AccordionDetails>
+                            </Accordion>
+                        </div>
+
+
+
+
                     </Segment>
                 }
 
-                { previousConsultation &&
+{/*                { previousConsultation &&
                     <Segment>
-                        <Label as='a' color='black' ribbon>
+                        <Label as='a' color='black' style={{width:'100%',marginBottom:'10px'}}>
                             Conditions
                         </Label>
                         <br/>
@@ -378,7 +470,7 @@ const Widget = (props) => {
                             </div>
                         ))}
                     </Segment>
-                }
+                }*/}
 
                 { hasAllergies &&
                     <Segment>

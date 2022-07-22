@@ -1,6 +1,7 @@
 import React, {useState, Fragment } from "react";
 import { Row, Col, Card,  Tab, Tabs, } from "react-bootstrap";
 import Dashboard from './Patient/PatientList'
+import {Link} from "react-router-dom";
 
 
 const divStyle = {
@@ -14,10 +15,15 @@ const Home = () => {
 
   return (
     <Fragment>
-     
       <Row>
        
         <Col xl={12}>
+          <div className="row page-titles mx-0" style={{marginTop:"0.5px"}}>
+            <ol className="breadcrumb">
+              <li className="breadcrumb-item active"><Link to={`#`}>Consultation</Link></li>
+              <li className="breadcrumb-item  "><Link to={`#`}>Patient List</Link></li>
+            </ol>
+          </div>
           <Card style={divStyle}>
             
             <Card.Body>
