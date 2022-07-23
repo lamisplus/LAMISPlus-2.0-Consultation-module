@@ -40,7 +40,7 @@ const Widget = (props) => {
     const [hasAllergies, setHasAllergies] = useState(false);
     const [pharmacyModal, setPharmacyModal] = useState(false);
     const [pharmacyOrderModal, setPharmacyOrderModal] = useState(false);
-    const [last5Vitals, setlast5Vitals] = useState([]);
+    const [otherVisitsVitals, setOtherVisitVitals] = useState([]);
     const [previousConsultation, setPreviousConsultation] = useState([]);
     const [encounterDate, setEncounterDate] = useState(new Date());
     const { handleSubmit, control, getValues, setError, setValue } = useForm();
@@ -209,10 +209,10 @@ const Widget = (props) => {
         }
     }, []);
 
-    const loadPatientVitals = useCallback(async () => {
+    const loadOtherVisitsVitals = useCallback(async () => {
         try {
             const response = await axios.get(`${baseUrl}patient/vital-sign/person/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`}});
-            setPatientVitals(response.data);
+            setOtherVisitVitals(response.data);
         } catch (e) {
             toast.error("An error occurred while fetching vitals", {
                 position: toast.POSITION.TOP_RIGHT
@@ -222,8 +222,8 @@ const Widget = (props) => {
 
     const loadPreviousConsultation = useCallback(async () => {
         try {
-            //const response = await axios.get(`${baseUrl}consultations/consultations-by-patient-id/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`}});
-            setPreviousConsultation([]);
+            const response = await axios.get(`${baseUrl}consultations/consultations-by-patient-id/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`}});
+            setPreviousConsultation(response.data);
         } catch (e) {
             toast.error("An error occurred while fetching previous consultation", {
                 position: toast.POSITION.TOP_RIGHT
@@ -257,28 +257,16 @@ const Widget = (props) => {
     useEffect(() => {
         loadPharmacyCheck();
         loadLabCheck();
-        loadPatientVitals();
+        loadOtherVisitsVitals();
         loadPreviousConsultation();
         loadLabGroup();
         priority();
         pharmacy_by_visitId();
         getLatestVitals();
-    }, [loadPharmacyCheck, loadLabCheck, loadPatientVitals,
+    }, [loadPharmacyCheck, loadLabCheck, loadOtherVisitsVitals,
     loadPreviousConsultation, loadLabGroup, priority, pharmacy_by_visitId]);
 
-    const [latestVitals, setVitalSignDto]= useState({
-        bodyWeight: "",
-        diastolic: "",
-        encounterDate: "",
-        facilityId: "",
-        height: "",
-        personId:"",
-        pulse: "",
-        respiratoryRate: "",
-        systolic:"",
-        temperature: "",
-        visitId:""
-    })
+    const [latestVitals, setVitalSignDto]= useState({})
     ///GET LIST OF Patients
     async function getLatestVitals() {
         axios
@@ -286,14 +274,7 @@ const Widget = (props) => {
                 { headers: {"Authorization" : `Bearer ${token}`} }
             )
             .then((response) => {
-                console.log('current vitals')
                 setVitalSignDto(response.data);
-                console.log('current vitals')
-/*
-                setBMI(Math.round(response.data.bodyWeight/Math.pow(response.data.height,2)));
-                setVisitVitalStatus(true);
-                setCurrentVitalId(response.data.id)
-                props.setVisitVitalExists(true);*/
             })
             .catch((error) => {
             });
@@ -397,12 +378,8 @@ const Widget = (props) => {
     return (
         <Grid columns='equal'>
             <Grid.Column>
-                { latestVitals && latestVitals.length > 0 &&
+                {  Object.keys(latestVitals).length > 0 &&
                     <Segment>
-{/*                        <Label as='a' color='blue'  style={{width:'100%',marginBottom:'10px'}}>
-                             Vitals
-                        </Label>
-                        <br/>*/}
 
                         <div className={classes.root}>
                             <Accordion style={{minHeight:'45px',padding:'0px 0px 0px 0px'}} defaultExpanded={true}>
@@ -413,38 +390,51 @@ const Widget = (props) => {
                                     style={{padding:'0px 0px 0px 2px',borderBottom:'2px solid #eee'}}
                                 >
                                     <Label as='a' color='blue'  style={{width:'100%'}}>
-                                        <Typography className={classes.heading}>Current Vitals - Date - 2022-07-20</Typography>
+                                        <Typography className={classes.heading}>Current Vitals - Date - {latestVitals.encounterDate}</Typography>
                                     </Label>
 
                                 </AccordionSummary>
                                 <AccordionDetails style={{padding:'8px'}}>
                                     <List celled style={{width:'100%'}}>
-                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px',borderTop:'1px solid #fff', marginTop:'-5px' }}>Pulse <span className="float-end"><b>{latestVitals.pulse} bpm</b></span></List.Item>
-                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Respiratory Rate <span className="float-end"><b>{latestVitals.respiratoryRate} bpm</b></span></List.Item>
-                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Temperature <span className="float-end"><b>{latestVitals.temperature} <sup>0</sup>C</b></span></List.Item>
-                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Blood Pressure <span  className="float-end"><b>{latestVitals.systolic}/{latestVitals.diastolic}</b></span></List.Item>
-                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Height <span  className="float-end"><b>{latestVitals.height} cm</b></span></List.Item>
-                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Weight <span  className="float-end"><b>{latestVitals.bodyWeight} kg</b></span></List.Item>
-                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>BMI <span  className="float-end"><b>{latestVitals.bodyWeight} kg</b></span></List.Item>
+                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px',borderTop:'1px solid #fff', marginTop:'-5px' }}>Pulse <span style={{color:'rgb(153, 46, 98)'}} className="float-end"><b>{latestVitals.pulse} bpm</b></span></List.Item>
+                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Respiratory Rate <span className="float-end"><b style={{color:'rgb(153, 46, 98)'}}>{latestVitals.respiratoryRate} bpm</b></span></List.Item>
+                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Temperature <span className="float-end"><b style={{color:'rgb(153, 46, 98)'}}>{latestVitals.temperature} <sup>0</sup>C</b></span></List.Item>
+                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Blood Pressure <span  className="float-end"><b style={{color:'rgb(153, 46, 98)'}}>{latestVitals.systolic}/{latestVitals.diastolic}</b></span></List.Item>
+                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Height <span  className="float-end"><b style={{color:'rgb(153, 46, 98)'}}>{latestVitals.height} cm</b></span></List.Item>
+                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Weight <span  className="float-end"><b style={{color:'rgb(153, 46, 98)'}}>{latestVitals.bodyWeight} kg</b></span></List.Item>
+                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>BMI <span  className="float-end"><b style={{color:'rgb(153, 46, 98)'}}>{latestVitals.bodyWeight} kg</b></span></List.Item>
                                     </List>
                                 </AccordionDetails>
                             </Accordion>
-                            <Accordion>
-                                <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon />}
-                                    aria-controls="panel2a-content"
-                                    id="panel2a-header"
-                                    style={{padding:'0px 0px 0px 10px'}}
-                                >
-                                    <Typography className={classes.heading}>Accordion 2</Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <Typography>
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
-                                        sit amet blandit leo lobortis eget.
-                                    </Typography>
-                                </AccordionDetails>
-                            </Accordion>
+
+                            {otherVisitsVitals && otherVisitsVitals.length > 0 &&
+                                otherVisitsVitals.map(vital =>
+                                    <Accordion>
+                                        <AccordionSummary
+                                            expandIcon={<ExpandMoreIcon />}
+                                            aria-controls="panel2a-content"
+                                            id="panel2a-header"
+                                            style={{padding:'0px 0px 0px 10px'}}
+                                        >
+                                            <Typography className={classes.heading} style={{color:'#014d88'}}>Vitals Collection - Date - {vital.encounterDate}</Typography>
+                                        </AccordionSummary>
+                                        <AccordionDetails style={{padding:'8px'}}>
+                                            <List celled style={{width:'100%'}}>
+                                                <List.Item style={{paddingBottom:'10px', paddingTop:'10px',borderTop:'1px solid #fff', marginTop:'-5px' }}>Pulse <span  style={{color:'#014d88'}} className="float-end"><b>{vital.pulse} bpm</b></span></List.Item>
+                                                <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Respiratory Rate <span className="float-end" style={{color:'#014d88'}}><b>{vital.respiratoryRate} bpm</b></span></List.Item>
+                                                <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Temperature <span className="float-end" style={{color:'#014d88'}}><b>{vital.temperature} <sup>0</sup>C</b></span></List.Item>
+                                                <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Blood Pressure <span  className="float-end" style={{color:'#014d88'}}><b>{vital.systolic}/{vital.diastolic}</b></span></List.Item>
+                                                <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Height <span  className="float-end" style={{color:'#014d88'}}><b>{vital.height} cm</b></span></List.Item>
+                                                <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Weight <span  className="float-end" style={{color:'#014d88'}}><b>{vital.bodyWeight} kg</b></span></List.Item>
+                                                <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>BMI <span  className="float-end" style={{color:'#014d88'}}><b>{vital.bodyWeight} kg</b></span></List.Item>
+                                            </List>
+                                        </AccordionDetails>
+                                    </Accordion>
+                                )
+
+                            }
+
+
                         </div>
 
 
@@ -489,14 +479,14 @@ const Widget = (props) => {
 
             <Grid.Column width={9}>
                 <form onSubmit={handleSubmit(onSubmit, OnError)}>
-                    <Label as='a' color='black' ribbon>
+                    <Label as='a' color='black' style={{width:'100%',height:'35px',fontSize:'16px'}}>
                         <b>Physical Examination</b>
                     </Label>
 
                     <Segment>
-                        <div className="input-group input-group-sm mb-3">
-                            <span className="input-group-text">Encounter Date</span>
-                            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <div className="input-group input-group-sm mb-3" >
+                            <span className="input-group-text" style={{height:'40px',backgroundColor:'#014d88',color:'#fff', fontSize:'14px'}}>Encounter Dates</span>
+                            <MuiPickersUtilsProvider utils={DateFnsUtils} >
                                 <Controller
                                     name="encounterDate"
                                     control={control}
@@ -504,6 +494,7 @@ const Widget = (props) => {
                                     rules={{ required: true }}
                                     render={({ field: { ref, ...rest }}) => (
                                         <KeyboardDateTimePicker
+                                            style={{height:'40px', border:'1px solid #014d88'}}
                                             disableFuture
                                             format="dd/MM/yyyy hh:mm a"
                                             value={encounterDate}
@@ -518,21 +509,21 @@ const Widget = (props) => {
                         </div>
 
                         <div className="input-group input-group-sm " >
-                            <span className="input-group-text">Visit Note</span>
+                            <span className="input-group-text" style={{height:'300px',backgroundColor:'#014d88',color:'#fff', fontSize:'14px'}}>Visit Note</span>
                             <Controller
                                 name="visitNote"
                                 control={control}
                                 rules={{ required: true }}
                                 render={({ field: { ref, ...rest }}) => (
-                                    <textarea  style={{ minHeight: 100 }} className="form-control" {...rest} ></textarea>
+                                    <textarea  style={{ minHeight: 300,border:'1px solid #014d88' }} className="form-control" {...rest} ></textarea>
                                 )}
                             />
                         </div>
                         <br/>
-                        <Label as='a' color='red' ribbon>
+                        <Label as='a'  style={{backgroundColor:'#014d88', color:'#fff',width:'100%',height:'35px',fontSize:'16px'}}>
                             Presenting Complaints
                         </Label>
-                        <Table color="red" celled>
+                        <Table style={{color:'#014d88',borderColor:'#014d88'}} celled >
                             <Table.Header>
                                 <Table.Row>
                                     <Table.Cell style={{ fontWeight: 'bold'}}>Complaints</Table.Cell>
@@ -617,10 +608,10 @@ const Widget = (props) => {
                             </Table.Footer>
                         </Table>
                         <br/>
-                        <Label as='a' color='pink' ribbon>
+                        <Label as='a' style={{backgroundColor:'#992E62', color:'#fff', width:'100%',height:'35px',fontSize:'16px'}}>
                             Clinical Diagnosis
                         </Label>
-                        <Table color="pink" celled>
+                        <Table style={{color:'#992E62',borderColor:'#992E62'}} celled>
                             <Table.Header>
                                 <Table.Row>
                                     <Table.Cell style={{ fontWeight: 'bold'}}>Condition</Table.Cell>
@@ -679,7 +670,7 @@ const Widget = (props) => {
                                 <Table.Row>
                                     <Table.HeaderCell>
 
-                                        <Button color="blue" size="tiny" type="button" onClick={() => handleAddDiagFields()}>
+                                        <Button style={{backgroundColor:'#992E62',color:'#fff'}} size="tiny" type="button" onClick={() => handleAddDiagFields()}>
                                             <Icon name='plus' /> Add More
                                         </Button>
                                     </Table.HeaderCell>
@@ -689,7 +680,7 @@ const Widget = (props) => {
                         </Table>
                         <br/>
                         { isLabEnabled && <div>
-                            <Label as='a' color='teal' ribbon>
+                            <Label as='a' color='teal' style={{width:'100%',height:'35px',fontSize:'16px'}}>
                                 Lab Test
                             </Label>
 
@@ -796,7 +787,7 @@ const Widget = (props) => {
                             </Table>
                         </div>}
                         <br/>
-                        <Label as='a' color='purple' ribbon>
+                        <Label as='a' color='purple' style={{width:'100%',height:'35px',fontSize:'16px'}}>
                             Pharmacy Order
                         </Label>
                         <br/>
@@ -843,6 +834,7 @@ const Widget = (props) => {
           </Grid.Column>
           <Grid.Column>
             <Segment>
+
             <List>
                   <List.Item>
                       <Link
@@ -850,27 +842,49 @@ const Widget = (props) => {
                               pathname: "/patient-consultations-history",
                               state: { patientObj: patientObj  }
                           }}>
-                          <Button icon labelPosition='right' color='green' fluid>
+                          <Button icon labelPosition='right'  style={{width:'100%',backgroundColor:'#992E62',color:"#fff", padding:'15px'}}  fluid>
                               <Icon name='eye' />
-                              View History
+                              View Consultation History
                           </Button>
                       </Link>
                   </List.Item>
-                  <List.Item>
+{/*                  <List.Item>
                   <Button icon labelPosition='right' color='blue' fluid>
                       <Icon name='calendar alternate' />
                         Appointment 
                     </Button>
-                  </List.Item>
+                  </List.Item>*/}
             </List>
                 { previousConsultation &&
-                    <Card>
-                        <Card.Content>
-                            <b>Previous Clinical Notes</b>
+                    <Card style={{width:'100%'}}>
+                        <Card.Content style={{padding:'5px'}}>
+                            <Label as='a'   style={{width:'100%',backgroundColor:'#014d88',color:"#fff", padding:'10px'}}>
+                                <Typography className={classes.heading}><b>Previous Clinical Notes</b></Typography>
+                            </Label>
+
                         </Card.Content>
-                        <Card.Content>
+                        <Card.Content style={{padding:'5px'}}>
                             <Feed>
-                                { previousConsultation.map((consultation, i) => (
+                                {previousConsultation && previousConsultation.length > 0 &&
+                                    previousConsultation.map(consultation =>
+                                        <Accordion>
+                                            <AccordionSummary
+                                                expandIcon={<ExpandMoreIcon style={{color:'#fff'}} />}
+                                                aria-controls="panel2a-content"
+                                                id="panel2a-header"
+                                                style={{padding:'0px 0px 0px 10px',backgroundColor:'#1678c2',border:'2px solid #ddd',color:'#fff'}}
+                                            >
+                                                <Typography className={classes.heading} >Consultation -Date - {consultation.encounterDate}</Typography>
+                                            </AccordionSummary>
+                                            <AccordionDetails style={{padding:'10px 5px',minHeight:100,border:'2px solid #ddd', marginTop:'-10px'}}>
+                                                {consultation.visitNotes}
+                                            </AccordionDetails>
+                                        </Accordion>
+                                    )
+
+                                }
+
+{/*                                { previousConsultation.map((consultation, i) => (
                                     <div>
                                         <Feed.Event>
                                             <Feed.Content>
@@ -882,7 +896,7 @@ const Widget = (props) => {
                                         </Feed.Event>
                                         <hr/>
                                     </div>
-                                )) }
+                                )) }*/}
                             </Feed>
                         </Card.Content>
                     </Card>

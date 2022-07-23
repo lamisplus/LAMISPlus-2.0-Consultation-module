@@ -12,10 +12,13 @@ import { Button } from 'semantic-ui-react';
 import {Label,} from "semantic-ui-react";
 import 'semantic-ui-css/semantic.min.css';
 import { Col, Row } from "reactstrap";
-import Moment from "moment";
+
 import moment from "moment";
 import PostPatient from './PostPatient'
 import { Link } from 'react-router-dom'
+import MatButton from "@material-ui/core/Button";
+import { TiArrowBack } from 'react-icons/ti'
+
 
 const styles = theme => ({
   root: {
@@ -109,119 +112,106 @@ function PatientCard(props) {
   
   return (
     <div className={classes.root}>
-       <ExpansionPanel defaultExpanded>
-                <ExpansionPanelSummary expandicon={<ExpandMoreIcon />}>
-                
+        <ExpansionPanel defaultExpanded>
+            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+
                 <Row>
-                    
+
+
                     <Col md={11}>
-                    <Row className={"mt-1"}>
-                    <Col md={12} className={classes.root2}>
-                        <b style={{fontSize: "25px"}}>
-                        {patientObj.firstName + " " + patientObj.surname }
-                        </b>
-                        
-                    </Col>
-                    <Col md={4} className={classes.root2}>
-                    <span>
-                        {" "}
-                        Patient ID : <b>{getHospitalNumber(patientObj.identifier) }</b>
-                    </span>
-                    </Col>
+                        <Row className={"mt-1"}>
+                            <Col md={12} className={classes.root2} >
+                                <b style={{fontSize: "25px", color:'rgb(153, 46, 98)'}}>
+                                    {patientObj.surname + ", " + patientObj.firstName + " " + patientObj.otherName}
+                                    < span style={{color:'green'}}>
+                                             {": "+"Active"}
+                                        </span>
+                                </b>
 
-                    <Col md={4} className={classes.root2}>
-                    <span>
-                        Date Of Birth : <b>{patientObj.dateOfBirth }</b>
-                    </span>
-                    </Col>
-                    <Col md={4} className={classes.root2}>
-                    <span>
-                        {" "}
-                        Age : <b>{calculate_age(moment(patientObj.dateOfBirth).format("DD-MM-YYYY"))}</b>
-                    </span>
-                    </Col>
-                    <Col md={4}>
-                    <span>
-                        {" "}
-                        Gender :{" "}
-                        <b>{patientObj.gender.display }</b>
-                    </span>
-                    </Col>
-                    <Col md={4} className={classes.root2}>
-                    <span>
-                        {" "}
-                        Phone Number : <b>{getPhoneNumber(patientObj.contactPoint)}</b>
-                    </span>
-                    </Col>
-                    <Col md={4} className={classes.root2}>
-                    <span>
-                        {" "}
-                        Address : <b>{getAddress(patientObj.address)} </b>
-                    </span>
-                    </Col>
+                            </Col>
+                            <Col md={4} className={classes.root2} style={{marginTop:"10px"}}>
+                                    <span>
+                                        {" "}
+                                        Hospital Number : <b style={{color:'#0B72AA'}}>{getHospitalNumber(patientObj.identifier) }</b>
+                                    </span>
+                            </Col>
 
-                    <Col md={12}>
-                    {/* {HIVStatus(patientObj)} */}
-                    <span>
-                        {" "}
-                        <b>Status : </b> {CurrentStatus()}
-                      </span>
-                      
+                            <Col md={4} className={classes.root2} style={{marginTop:"10px"}}>
+                                    <span>
+                                        Date Of Birth : <b style={{color:'#0B72AA'}}>{patientObj.dateOfBirth }</b>
+                                    </span>
+                            </Col>
+                            <Col md={4} className={classes.root2} style={{marginTop:"10px"}}>
+                                <span>
+                                    {" "}
+                                    Age : <b style={{color:'#0B72AA'}}>{calculate_age(patientObj.dateOfBirth) }</b>
+                                </span>
+                            </Col>
+                            <Col md={4} style={{marginTop:"10px"}}>
+                                    <span>
+                                        {" "}
+                                        Gender :{" "}
+                                        <b style={{color:'#0B72AA'}}>{patientObj.gender.display }</b>
+                                    </span>
+
+                            </Col>
+                            <Col md={4} className={classes.root2} style={{marginTop:"10px"}}>
+                                <span>
+                                    {" "}
+                                    Phone Number : <b style={{color:'#0B72AA'}}>{getPhoneNumber(patientObj.contactPoint)}</b>
+                                </span>
+                            </Col>
+                            <Col md={4} className={classes.root2} style={{marginTop:"10px"}}>
+                                <span>
+                                    {" "}
+                                    Address : <b style={{color:'#0B72AA'}}>{getAddress(patientObj.address)} </b>
+                                </span>
+
+                            </Col>
+
+
+                        </Row>
                     </Col>
-                    </Row>
-                    </Col>
-                    <div className="float-end">
-                      {" "}<Button secondary floated='right'  onClick={() => PostPatientService(patientObj)}>Post Patient</Button>
-                      <Link to={"/"} >
-                       <Button primary floated='right'>Back</Button>
-                      </Link>
+                    <div className="float-end" style={{floated:'right'}}>
+                        {" "}<Link to={"/"} >
+                        <Button
+                            floated='right'
+                            style={{padding:'0px'}}
+                        >
+                            <MatButton
+                                variant="contained"
+                                floated='right'
+                                startIcon={<TiArrowBack  />}
+                                style={{backgroundColor:"rgb(153, 46, 98)", color:'#fff', height:'35px'}}
+                            >
+                                <span style={{ textTransform: "capitalize" }}>Back</span>
+                            </MatButton>
+                        </Button>
+
+                    </Link>
+
+                                {" "}<Button  floated='right'  style={{backgroundColor:"#014d88", color:'#fff',height:'35px'}} onClick={() => PostPatientService(patientObj)}>Post Patient</Button>
+
+
                     </div>
                 </Row>
-            
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails className={classes.details}>
-                
-                    <Button
-                      color='red'
-                      content='Blood Presure'
-                      //icon='heart'
-                      label={{ basic: true, color: 'red', pointing: 'left', content: '11/22' }}
-                    />
-                                  
-                    <Button
-                        basic
-                        color='blue'
-                        content='Height'
-                        icon='fork'
-                        label={{
-                            as: 'a',
-                            basic: true,
-                            color: 'blue',
-                            pointing: 'left',
-                            content: '74.5 in',
-                        }}
-                      />              
-                      <Button
-                        basic
-                        color='blue'
-                        content='Weight'
-                        icon='fork'
-                        label={{
-                            as: 'a',
-                            basic: true,
-                            color: 'blue',
-                            pointing: 'left',
-                            content: '74.5 in',
-                        }}
-                        />
-                               
-                 
-                </ExpansionPanelDetails>
-                <Divider />
-                <ExpansionPanelActions expandIcon={<ExpandMoreIcon />}>
-                
-                </ExpansionPanelActions>
-            </ExpansionPanel>
+
+            </ExpansionPanelSummary>
+            <Divider />
+            <ExpansionPanelActions expandIcon={<ExpandMoreIcon />}>
+
+            </ExpansionPanelActions>
+        </ExpansionPanel>
+
+
+
+
+
+
+
+
+
+
             <PostPatient toggle={toggle} showModal={modal} patientObj={patientObj} />
     </div>
   );

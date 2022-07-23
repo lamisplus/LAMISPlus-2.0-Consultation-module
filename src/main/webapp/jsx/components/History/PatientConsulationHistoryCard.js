@@ -1,0 +1,176 @@
+import React, {Fragment} from 'react';
+import {FormControl, FormGroup} from "@material-ui/core";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
+import Divider from "@mui/material/Divider";
+import {Button, Icon, Input, List, Table} from "semantic-ui-react";
+
+function PatientConsultationHistoryCard({visit}) {
+    return (
+        <div>
+            <Paper elevation={1} style={{maxHeight: 250, overflow: 'auto',padding:'10px', backgroundColor:'#039be5'}}>
+                <h3 style={{color:'#fff '}}> {visit.encounterDate} --- Consultation</h3>
+            </Paper>
+
+            <h3 style={{color:'#992E62'}}>Clinical Notes</h3>
+            <Divider />
+            <Paper elevation={1} style={{minHeight:200, maxHeight: 350, scrollbarWidth:'10', overflow: 'auto',border:'1px solid #A5E2FF', marginTop:'5px'}}>
+                <div style={{border:'10px solid #fff'}}>
+                    <Typography variant="body1" style={{fontFamily:'Trebuchet'}}>
+                        {visit.visitNotes}
+                    </Typography>
+                </div>
+            </Paper>
+
+            <h3 style={{color:'#014d88'}}>Presenting Complaints</h3>
+            <Divider />
+            <Paper elevation={1} style={{minHeight:100, overflow: 'auto',border:'1px solid #A5E2FF', marginTop:'5px'}}>
+                <div style={{border:'5px solid #fff'}}>
+                    <Table style={{color:'#014d88',borderColor:'#ddd'}} celled >
+                        <Table.Header style={{backgroundColor:'#014d88',color:'#fff',borderColor:'#014d88'}}>
+                            <Table.Row>
+                                <Table.Cell style={{ fontWeight: 'bold'}}>Complaints</Table.Cell>
+                                <Table.Cell style={{ fontWeight: 'bold'}}>Onset Date</Table.Cell>
+                                <Table.Cell style={{ fontWeight: 'bold'}}>Severity</Table.Cell>
+                                <Table.Cell style={{ fontWeight: 'bold'}}>Date Resolved</Table.Cell>
+                            </Table.Row>
+                        </Table.Header>
+
+                        <Table.Body>
+                            {visit.presentingComplaints.map((presentingComplaint, index) => (
+                                <Fragment key={`${presentingComplaint.id}~${index}`}>
+                                    <Table.Row>
+                                        <Table.Cell>
+                                            {presentingComplaint.complaint}
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            {presentingComplaint.onsetDate}
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            {presentingComplaint.severity}
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            {presentingComplaint.dateResolved}
+                                        </Table.Cell>
+                                    </Table.Row>
+                                </Fragment>
+                            ))}
+                        </Table.Body>
+                    </Table>
+                </div>
+            </Paper>
+
+            <h3 style={{color:'#992E62'}}>Clinical Diagnosis</h3>
+            <Divider />
+            <Paper elevation={1} style={{minHeight:100,border:'5px solid #f7f7f7', marginTop:'5px'}}>
+                <div style={{border:'5px solid #fff'}}>
+                    <Table style={{color:'#014d88',borderColor:'#ddd'}} celled >
+                        <Table.Header style={{backgroundColor:'#992E62',color:'#fff',borderColor:'#ddd'}}>
+                            <Table.Row>
+                                <Table.Cell style={{ fontWeight: 'bold'}}>Condition</Table.Cell>
+                                <Table.Cell style={{ fontWeight: 'bold'}}>Order</Table.Cell>
+                                <Table.Cell style={{ fontWeight: 'bold'}}>Certainty</Table.Cell>
+                                <Table.Cell style={{ fontWeight: 'bold'}}></Table.Cell>
+                            </Table.Row>
+                        </Table.Header>
+
+                        <Table.Body>
+                            {visit.diagnosisList.map((diagnosis, index) => (
+                                <Fragment key={`${diagnosis.id}~${index}`}>
+                                    <Table.Row>
+                                        <Table.Cell>
+                                            {diagnosis.diagnosis}
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            {diagnosis.order}
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            {diagnosis.certainty}
+                                        </Table.Cell>
+                                    </Table.Row>
+                                </Fragment>
+                            ))}
+                        </Table.Body>
+                    </Table>
+                </div>
+            </Paper>
+
+
+            <h3 style={{color:'teal'}}>Laboratory Test</h3>
+            <Divider />
+            <Paper elevation={1} style={{minHeight:100,border:'5px solid #f7f7f7', marginTop:'5px'}}>
+                <div style={{border:'5px solid #fff'}}>
+                    <Table style={{color:'#014d88',borderColor:'#ddd'}} celled >
+                        <Table.Header style={{backgroundColor:'teal',color:'#fff',borderColor:'#ddd'}}>
+                            <Table.Row>
+                                <Table.Cell style={{ fontWeight: 'bold'}}>Condition</Table.Cell>
+                                <Table.Cell style={{ fontWeight: 'bold'}}>Order</Table.Cell>
+                                <Table.Cell style={{ fontWeight: 'bold'}}>Certainty</Table.Cell>
+                                <Table.Cell style={{ fontWeight: 'bold'}}></Table.Cell>
+                            </Table.Row>
+                        </Table.Header>
+
+                        <Table.Body>
+                            {visit.diagnosisList.map((diagnosis, index) => (
+                                <Fragment key={`${diagnosis.id}~${index}`}>
+                                    <Table.Row>
+                                        <Table.Cell>
+                                            {diagnosis.diagnosis}
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            {diagnosis.order}
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            {diagnosis.certainty}
+                                        </Table.Cell>
+                                    </Table.Row>
+                                </Fragment>
+                            ))}
+                        </Table.Body>
+                    </Table>
+                </div>
+            </Paper>
+
+
+            <h3 style={{color:'purple '}}>Pharmacy Order</h3>
+            <Divider />
+            <Paper elevation={1} style={{minHeight:100,border:'5px solid #f7f7f7', marginTop:'5px'}}>
+                <div style={{border:'10px solid #fff'}}>
+                    <Table style={{color:'#014d88',borderColor:'#ddd'}} celled >
+                        <Table.Header style={{backgroundColor:'purple',color:'#fff',borderColor:'#ddd'}}>
+                            <Table.Row>
+                                <Table.Cell style={{ fontWeight: 'bold'}}>Condition</Table.Cell>
+                                <Table.Cell style={{ fontWeight: 'bold'}}>Order</Table.Cell>
+                                <Table.Cell style={{ fontWeight: 'bold'}}>Certainty</Table.Cell>
+                                <Table.Cell style={{ fontWeight: 'bold'}}></Table.Cell>
+                            </Table.Row>
+                        </Table.Header>
+
+                        <Table.Body>
+                            {visit.diagnosisList.map((diagnosis, index) => (
+                                <Fragment key={`${diagnosis.id}~${index}`}>
+                                    <Table.Row>
+                                        <Table.Cell>
+                                            {diagnosis.diagnosis}
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            {diagnosis.order}
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            {diagnosis.certainty}
+                                        </Table.Cell>
+                                    </Table.Row>
+                                </Fragment>
+                            ))}
+                        </Table.Body>
+                    </Table>
+                </div>
+            </Paper>
+
+
+
+        </div>
+    );
+}
+
+export default PatientConsultationHistoryCard;
