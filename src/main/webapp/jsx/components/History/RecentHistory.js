@@ -14,11 +14,10 @@ import ButtonMui from "@material-ui/core/Button";
 import AddPharmacyOrder from './AddPharmacyOrder';
 import EditPharmacyOrder from './EditPharmacyOrder';
 import { makeStyles } from '@material-ui/core/styles';
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
+import { Accordion,AccordionSummary,AccordionDetails } from '@material-ui/core'
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import _ from "lodash";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -81,11 +80,11 @@ const Widget = (props) => {
                 const response = await axios.get(`${apiUrl}drug-orders/visits/${patientObj.visitId}`,
                 { headers: {"Authorization" : `Bearer ${token}`}});
 
-                console.log("red",response.data)
 
                 if (typeof response.data === 'string') {
                     setPharmacyOrder([]);
                 }else {
+                    console.log("red",response.data)
                     setPharmacyOrder(response.data);
                 }
 
@@ -212,7 +211,11 @@ const Widget = (props) => {
     const loadOtherVisitsVitals = useCallback(async () => {
         try {
             const response = await axios.get(`${baseUrl}patient/vital-sign/person/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`}});
-            setOtherVisitVitals(response.data);
+            if(response.data.length > 0){
+                let otherVisits = _.remove(response.data,{visitId:patientObj.visitId})
+                setOtherVisitVitals(otherVisits);
+            }
+
         } catch (e) {
             toast.error("An error occurred while fetching vitals", {
                 position: toast.POSITION.TOP_RIGHT
@@ -460,7 +463,7 @@ const Widget = (props) => {
                             </div>
                         ))}
                     </Segment>
-                }*/}
+                }
 
                 { hasAllergies &&
                     <Segment>
@@ -474,7 +477,7 @@ const Widget = (props) => {
                             <Label as='a'  size="mini">smoke</Label>
                         </Label.Group>
                     </Segment>
-                }
+                }*/}
             </Grid.Column>
 
             <Grid.Column width={9}>
@@ -761,11 +764,11 @@ const Widget = (props) => {
                                                         id="status">
                                                         <option>Select</option>
                                                         <option value="0">Pending Collection</option>
-                                                       {/* <option value="1">Sample Collected</option>
+                                                        <option value="1">Sample Collected</option>
                                                         <option value="2">Sample Transferred</option>
                                                         <option value="3">Sample Verified</option>
                                                         <option value="4">Sample Rejected</option>
-                                                        <option value="5">Result Available</option> */}
+                                                        <option value="5">Result Available</option>
                                                     </select>
                                                 </Table.Cell>
                                             </Table.Row>
@@ -851,7 +854,7 @@ const Widget = (props) => {
 {/*                  <List.Item>
                   <Button icon labelPosition='right' color='blue' fluid>
                       <Icon name='calendar alternate' />
-                        Appointment 
+                        Appointment
                     </Button>
                   </List.Item>*/}
             </List>
@@ -876,27 +879,13 @@ const Widget = (props) => {
                                             >
                                                 <Typography className={classes.heading} >Consultation -Date - {consultation.encounterDate}</Typography>
                                             </AccordionSummary>
-                                            <AccordionDetails style={{padding:'10px 5px',minHeight:100,border:'2px solid #ddd', marginTop:'-10px'}}>
+                                            <AccordionDetails style={{padding:'10px 5px',minHeight:100,border:'2px solid #ddd', marginTop:'-10px',fontFamily:'Trebuchet'}}>
                                                 {consultation.visitNotes}
                                             </AccordionDetails>
                                         </Accordion>
                                     )
 
                                 }
-
-{/*                                { previousConsultation.map((consultation, i) => (
-                                    <div>
-                                        <Feed.Event>
-                                            <Feed.Content>
-                                                <Feed.Date content={consultation.encounterDate} />
-                                                <Feed.Summary>
-                                                    {consultation.visitNotes}
-                                                </Feed.Summary>
-                                            </Feed.Content>
-                                        </Feed.Event>
-                                        <hr/>
-                                    </div>
-                                )) }*/}
                             </Feed>
                         </Card.Content>
                     </Card>

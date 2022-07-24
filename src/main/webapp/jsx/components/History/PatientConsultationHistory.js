@@ -25,6 +25,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { makeStyles } from '@material-ui/core/styles'
 import "@reach/menu-button/styles.css";
 import ButtonMui from "@material-ui/core/Button";
+import MatButton from "@material-ui/core/Button";
+import { TiArrowBack } from 'react-icons/ti'
 import { toast } from 'react-toastify';
 import Box from '@mui/material/Box';
 import Card from "@mui/material/Card";
@@ -139,14 +141,23 @@ const PatientConsultationHistory = (props) => {
     return (
         <Container style={{width:'100%'}}>
             <br/><br/>
-            <Link to={"/"} >
-                <ButtonMui
-                    variant="contained"
-                    color="primary"
-                    className=" float-end ms-2"
+            <Link to={{
+                pathname: "/patient-history",
+                state: { patientObj: patientObj  }
+            }} >
+                <Button
+                    floated='right'
+                    style={{padding:'0px'}}
                 >
-                    <span style={{ textTransform: "capitalize" }}>Back</span>
-                </ButtonMui>
+                    <MatButton
+                        variant="contained"
+                        floated='right'
+                        startIcon={<TiArrowBack  />}
+                        style={{backgroundColor:"rgb(153, 46, 98)", color:'#fff', height:'35px'}}
+                    >
+                        <span style={{ textTransform: "capitalize" }}>Back</span>
+                    </MatButton>
+                </Button>
             </Link>
             <br/><br/>
 

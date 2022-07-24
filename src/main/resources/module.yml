@@ -4,8 +4,8 @@ store: true
 menus:
   - icon: flaticon-087-stop
     disabled: false
-    name: consultation
-    state: consultation
+    name: Consultation
+    state: Consultation
     url: /across/resources/static/consultation/index.html
 umdLocation: /across/resources/static/consultation/index.html
 webModules:

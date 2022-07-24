@@ -15,17 +15,16 @@ import { Link } from 'react-router-dom'
 
 
 
-const options = ['Delete', 'Edit'];
-
 
 
 export default function SplitActionButton(props) {
     const [open, setOpen] = React.useState(false);
     const anchorRef = useRef(null);
-    const [selectedIndex, setSelectedIndex] = React.useState(1);
 
     const handleClick = () => {
-        console.info(`You clicked ${options[selectedIndex]}`);
+        console.info(`You clicked`);
+        console.info(props.actions[0].actions[0].to);
+        console.info(`You clicked`);
     };
 
     const handleMenuItemClick = () => {

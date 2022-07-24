@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import MaterialTable from 'material-table';
+import MaterialTable from '@material-table/core';
 import axios from "axios";
 import { url as baseUrl, token } from "./../../../api";
 
@@ -143,6 +143,8 @@ const Patients = (props) => {
 
 
     function actionItems(row){
+        console.log(row);
+        console.log('try 11')
         return  [
             {
                 type:'single',
@@ -151,15 +153,6 @@ const Patients = (props) => {
                         name:'Dashboard',
                         type:'link',
                         icon:<FaEye  size="22"/>,
-                        to:{
-                            pathname: "/patient-history",
-                            state: { patientObj: row  }
-                        }
-                    },
-                    {
-                        name:'Patient Dashboard',
-                        type:'link',
-                        icon:<MdPerson size="20" color='#014d88' />,
                         to:{
                             pathname: "/patient-history",
                             state: { patientObj: row  }
@@ -203,29 +196,7 @@ const Patients = (props) => {
                                 ? 0
                                 : calculate_age(moment(row.dateOfBirth).format("DD-MM-YYYY")),
 
-                            actions:
-
-                                <div>
-                                    <SplitActionButton actions={actionItems(row)} />
-{/*                                    <Menu>
-                                        <MenuButton style={{ backgroundColor:"#3F51B5", color:"#fff", border:"2px solid #3F51B5", borderRadius:"4px", }}>
-                                            Actions <span aria-hidden>▾</span>
-                                        </MenuButton>
-                                        <MenuList style={{ color:"#000000 !important"}} >
-
-                                            <MenuItem style={{ color:"#000 !important"}}>
-                                                <Link
-                                                    to={{
-                                                        pathname: "/patient-history",
-                                                        state: { patientObj: row  }
-                                                    }}>
-                                                    <MdDashboard size="15" color="black" />{" "}<span style={{color: '#000'}}>Patient Dashboard</span>
-                                                </Link>
-                                            </MenuItem>
-
-                                        </MenuList>
-                                    </Menu>*/}
-                                </div>
+                               actions:<SplitActionButton actions={actionItems(row)} />
 
                         }))}
 

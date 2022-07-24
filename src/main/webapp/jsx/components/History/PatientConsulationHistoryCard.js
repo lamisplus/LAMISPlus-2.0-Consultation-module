@@ -12,7 +12,7 @@ function PatientConsultationHistoryCard({visit}) {
                 <h3 style={{color:'#fff '}}> {visit.encounterDate} --- Consultation</h3>
             </Paper>
 
-            <h3 style={{color:'#992E62'}}>Clinical Notes</h3>
+            <h3 style={{marginTop:'20px', color:'#992E62'}}>Clinical Notes</h3>
             <Divider />
             <Paper elevation={1} style={{minHeight:200, maxHeight: 350, scrollbarWidth:'10', overflow: 'auto',border:'1px solid #A5E2FF', marginTop:'5px'}}>
                 <div style={{border:'10px solid #fff'}}>
@@ -22,7 +22,7 @@ function PatientConsultationHistoryCard({visit}) {
                 </div>
             </Paper>
 
-            <h3 style={{color:'#014d88'}}>Presenting Complaints</h3>
+            <h3 style={{marginTop:'20px',color:'#014d88'}}>Presenting Complaints</h3>
             <Divider />
             <Paper elevation={1} style={{minHeight:100, overflow: 'auto',border:'1px solid #A5E2FF', marginTop:'5px'}}>
                 <div style={{border:'5px solid #fff'}}>
@@ -60,7 +60,7 @@ function PatientConsultationHistoryCard({visit}) {
                 </div>
             </Paper>
 
-            <h3 style={{color:'#992E62'}}>Clinical Diagnosis</h3>
+            <h3 style={{marginTop:'20px',color:'#992E62'}}>Clinical Diagnosis</h3>
             <Divider />
             <Paper elevation={1} style={{minHeight:100,border:'5px solid #f7f7f7', marginTop:'5px'}}>
                 <div style={{border:'5px solid #fff'}}>
@@ -96,7 +96,7 @@ function PatientConsultationHistoryCard({visit}) {
             </Paper>
 
 
-            <h3 style={{color:'teal'}}>Laboratory Test</h3>
+            <h3 style={{marginTop:'20px',color:'teal'}}>Laboratory Test</h3>
             <Divider />
             <Paper elevation={1} style={{minHeight:100,border:'5px solid #f7f7f7', marginTop:'5px'}}>
                 <div style={{border:'5px solid #fff'}}>
@@ -132,7 +132,7 @@ function PatientConsultationHistoryCard({visit}) {
             </Paper>
 
 
-            <h3 style={{color:'purple '}}>Pharmacy Order</h3>
+            <h3 style={{marginTop:'20px',color:'purple '}}>Pharmacy Order</h3>
             <Divider />
             <Paper elevation={1} style={{minHeight:100,border:'5px solid #f7f7f7', marginTop:'5px'}}>
                 <div style={{border:'10px solid #fff'}}>
