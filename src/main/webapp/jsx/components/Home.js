@@ -18,12 +18,12 @@ const Home = () => {
       <Row>
        
         <Col xl={12}>
-          <div className="row page-titles mx-0" style={{marginTop:"0.5px"}}>
+          {/*<div className="row page-titles mx-0" style={{marginTop:"0.5px"}}>
             <ol className="breadcrumb">
               <li className="breadcrumb-item active"><Link to={`#`}>Consultation</Link></li>
               <li className="breadcrumb-item  "><Link to={`#`}>Patient List</Link></li>
             </ol>
-          </div>
+          </div>*/}
           <Card style={divStyle}>
             
             <Card.Body>
