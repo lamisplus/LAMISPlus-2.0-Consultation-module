@@ -186,9 +186,9 @@ const Patients = (props) => {
                         ]}
                         data={ patientList.map((row) => ({
 
-                            name:row.firstName + " " + row.surname,
-                            hospital_number: getHospitalNumber(row.identifier),
-                            gender:row.gender.display,
+                            name:row.firstName + " " + row.otherName,
+                            hospital_number: row.identifier.identifier[0].value,
+                            gender:row.sex,
                             age: (row.dateOfBirth === 0 ||
                                 row.dateOfBirth === undefined ||
                                 row.dateOfBirth === null ||

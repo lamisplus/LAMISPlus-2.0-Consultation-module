@@ -564,7 +564,7 @@ const Widget = (props) => {
                                             </Table.Cell>
                                             <Table.Cell>
                                                 <select
-                                                    class="ui fluid selection dropdown"
+                                                    className="ui fluid selection dropdown"
                                                     value={inputField.severity}
                                                     onChange={event => handleInputChange(index, event)}
                                                     name="severity"
@@ -764,11 +764,11 @@ const Widget = (props) => {
                                                         id="status">
                                                         <option>Select</option>
                                                         <option value="0">Pending Collection</option>
-                                                        <option value="1">Sample Collected</option>
+                                                        {/*<option value="1">Sample Collected</option>
                                                         <option value="2">Sample Transferred</option>
                                                         <option value="3">Sample Verified</option>
                                                         <option value="4">Sample Rejected</option>
-                                                        <option value="5">Result Available</option>
+                                                        <option value="5">Result Available</option>*/}
                                                     </select>
                                                 </Table.Cell>
                                             </Table.Row>
