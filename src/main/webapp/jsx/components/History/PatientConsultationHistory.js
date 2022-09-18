@@ -126,7 +126,7 @@ const PatientConsultationHistory = (props) => {
 
     useEffect(() => {
         patientConsultations()
-    }, [patientConsultations]);
+    }, []);
 
     const formatDiagnosis = diagnosisList => {
         return diagnosisList.map(obj => obj.diagnosis) + " ,";
@@ -200,31 +200,9 @@ const PatientConsultationHistory = (props) => {
                                                 style={{width:'100%',border:'1px dotted #eee'}}
                                                 onClick={()=>loadConsultationDetails(row)}
                                             >
-                                                <span style={{padding:'10px 0px', fontSize:'16px', color: '#014d88', fontWeight:'bolder',float:'left'}}>{row.encounterDate} -- Status --- (Closed)</span>
+                                                <span style={{padding:'10px 0px', fontSize:'16px', color: '#014d88', fontWeight:'bolder',float:'left'}}>{row.encounterDate}</span>
                                             </Button>
                                         </div>
-                                    /*                                        date:row.encounterDate,
-                                                                            visitNotes:row.visitNotes,
-                                                                            diagnosisList:formatDiagnosis(row.diagnosisList),
-                                                                            presentingComplaints:formatPresentingComplaints(row.presentingComplaints),
-                                                                            actions:
-                                                                                <div>
-                                                                                    <Link
-                                                                                        to={{
-                                                                                            pathname: "/patient-consultation",
-                                                                                            state: { patientObj: row  }
-                                                                                        }}>
-                                                                                        <Button
-                                                                                            icon
-                                                                                            inverted
-                                                                                            color='blue'
-                                                                                            className=" float-end ms-2"
-                                                                                        >
-                                                                                            <Icon name='eye' />
-                                                                                        </Button>
-                                                                                    </Link>
-                                                                                </div>*/
-
                                 }))}
 
                                 options={{

@@ -4,12 +4,13 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Divider from "@mui/material/Divider";
 import {Button, Icon, Input, List, Table} from "semantic-ui-react";
+import moment from "moment";
 
 function PatientConsultationHistoryCard({visit}) {
     return (
         <div>
             <Paper elevation={1} style={{maxHeight: 250, overflow: 'auto',padding:'10px', backgroundColor:'#039be5'}}>
-                <h3 style={{color:'#fff '}}> {visit.encounterDate} --- Consultation</h3>
+                <h3 style={{color:'#fff '}}>{moment(visit.encounterDate).format("DD/MM/YYYY hh:mm A")}</h3>
             </Paper>
 
             <h3 style={{marginTop:'20px', color:'#992E62'}}>Clinical Notes</h3>
@@ -95,6 +96,7 @@ function PatientConsultationHistoryCard({visit}) {
                 </div>
             </Paper>
 
+{/*
 
             <h3 style={{marginTop:'20px',color:'teal'}}>Laboratory Test</h3>
             <Divider />
@@ -167,6 +169,7 @@ function PatientConsultationHistoryCard({visit}) {
                 </div>
             </Paper>
 
+*/}
 
 
         </div>

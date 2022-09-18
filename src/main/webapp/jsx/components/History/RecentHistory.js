@@ -18,6 +18,7 @@ import { Accordion,AccordionSummary,AccordionDetails } from '@material-ui/core'
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import _ from "lodash";
+import VitalsCard from "../Consultation/VitalsCard";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -266,8 +267,7 @@ const Widget = (props) => {
         priority();
         pharmacy_by_visitId();
         getLatestVitals();
-    }, [loadPharmacyCheck, loadLabCheck, loadOtherVisitsVitals,
-    loadPreviousConsultation, loadLabGroup, priority, pharmacy_by_visitId]);
+    }, []);
 
     const [latestVitals, setVitalSignDto]= useState({})
     ///GET LIST OF Patients
@@ -380,105 +380,7 @@ const Widget = (props) => {
 
     return (
         <Grid columns='equal'>
-            <Grid.Column>
-                {  Object.keys(latestVitals).length > 0 &&
-                    <Segment>
-
-                        <div className={classes.root}>
-                            <Accordion style={{minHeight:'45px',padding:'0px 0px 0px 0px'}} defaultExpanded={true}>
-                                <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon />}
-                                    aria-controls="panel1a-content"
-                                    id="panel1a-header"
-                                    style={{padding:'0px 0px 0px 2px',borderBottom:'2px solid #eee'}}
-                                >
-                                    <Label as='a' color='blue'  style={{width:'100%'}}>
-                                        <Typography className={classes.heading}>Current Vitals - Date - {latestVitals.encounterDate}</Typography>
-                                    </Label>
-
-                                </AccordionSummary>
-                                <AccordionDetails style={{padding:'8px'}}>
-                                    <List celled style={{width:'100%'}}>
-                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px',borderTop:'1px solid #fff', marginTop:'-5px' }}>Pulse <span style={{color:'rgb(153, 46, 98)'}} className="float-end"><b>{latestVitals.pulse} bpm</b></span></List.Item>
-                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Respiratory Rate <span className="float-end"><b style={{color:'rgb(153, 46, 98)'}}>{latestVitals.respiratoryRate} bpm</b></span></List.Item>
-                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Temperature <span className="float-end"><b style={{color:'rgb(153, 46, 98)'}}>{latestVitals.temperature} <sup>0</sup>C</b></span></List.Item>
-                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Blood Pressure <span  className="float-end"><b style={{color:'rgb(153, 46, 98)'}}>{latestVitals.systolic}/{latestVitals.diastolic}</b></span></List.Item>
-                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Height <span  className="float-end"><b style={{color:'rgb(153, 46, 98)'}}>{latestVitals.height} cm</b></span></List.Item>
-                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Weight <span  className="float-end"><b style={{color:'rgb(153, 46, 98)'}}>{latestVitals.bodyWeight} kg</b></span></List.Item>
-                                        <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>BMI <span  className="float-end"><b style={{color:'rgb(153, 46, 98)'}}>{latestVitals.bodyWeight} kg</b></span></List.Item>
-                                    </List>
-                                </AccordionDetails>
-                            </Accordion>
-
-                            {otherVisitsVitals && otherVisitsVitals.length > 0 &&
-                                otherVisitsVitals.map(vital =>
-                                    <Accordion>
-                                        <AccordionSummary
-                                            expandIcon={<ExpandMoreIcon />}
-                                            aria-controls="panel2a-content"
-                                            id="panel2a-header"
-                                            style={{padding:'0px 0px 0px 10px'}}
-                                        >
-                                            <Typography className={classes.heading} style={{color:'#014d88'}}>Vitals Collection - Date - {vital.encounterDate}</Typography>
-                                        </AccordionSummary>
-                                        <AccordionDetails style={{padding:'8px'}}>
-                                            <List celled style={{width:'100%'}}>
-                                                <List.Item style={{paddingBottom:'10px', paddingTop:'10px',borderTop:'1px solid #fff', marginTop:'-5px' }}>Pulse <span  style={{color:'#014d88'}} className="float-end"><b>{vital.pulse} bpm</b></span></List.Item>
-                                                <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Respiratory Rate <span className="float-end" style={{color:'#014d88'}}><b>{vital.respiratoryRate} bpm</b></span></List.Item>
-                                                <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Temperature <span className="float-end" style={{color:'#014d88'}}><b>{vital.temperature} <sup>0</sup>C</b></span></List.Item>
-                                                <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Blood Pressure <span  className="float-end" style={{color:'#014d88'}}><b>{vital.systolic}/{vital.diastolic}</b></span></List.Item>
-                                                <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Height <span  className="float-end" style={{color:'#014d88'}}><b>{vital.height} cm</b></span></List.Item>
-                                                <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>Weight <span  className="float-end" style={{color:'#014d88'}}><b>{vital.bodyWeight} kg</b></span></List.Item>
-                                                <List.Item style={{paddingBottom:'10px', paddingTop:'10px'}}>BMI <span  className="float-end" style={{color:'#014d88'}}><b>{vital.bodyWeight} kg</b></span></List.Item>
-                                            </List>
-                                        </AccordionDetails>
-                                    </Accordion>
-                                )
-
-                            }
-
-
-                        </div>
-
-
-
-
-                    </Segment>
-                }
-
-{/*                { previousConsultation &&
-                    <Segment>
-                        <Label as='a' color='black' style={{width:'100%',marginBottom:'10px'}}>
-                            Conditions
-                        </Label>
-                        <br/>
-
-                        { previousConsultation.map((consultation, i) => (
-                            <div>
-                                {consultation.diagnosisList.map((diagnosis, j)=> (
-                                    <Label as='a'  color='white'  size="mini" pointing>
-                                        {diagnosis.diagnosis}
-                                    </Label>
-                                ))}
-                            </div>
-                        ))}
-                    </Segment>
-                }
-
-                { hasAllergies &&
-                    <Segment>
-                        <Label as='a' color='red' ribbon>
-                            Allergies
-                        </Label>
-                        <br/><br/>
-
-                        <Label.Group color='blue'>
-                            <Label as='a'  size="mini">dust</Label>
-                            <Label as='a'  size="mini">smoke</Label>
-                        </Label.Group>
-                    </Segment>
-                }*/}
-            </Grid.Column>
+            <VitalsCard props={props} />
 
             <Grid.Column width={9}>
                 <form onSubmit={handleSubmit(onSubmit, OnError)}>
@@ -860,12 +762,12 @@ const Widget = (props) => {
             </List>
                 { previousConsultation &&
                     <Card style={{width:'100%'}}>
-                        <Card.Content style={{padding:'5px'}}>
+{/*                        <Card.Content style={{padding:'5px'}}>
                             <Label as='a'   style={{width:'100%',backgroundColor:'#014d88',color:"#fff", padding:'10px'}}>
                                 <Typography className={classes.heading}><b>Previous Clinical Notes</b></Typography>
                             </Label>
 
-                        </Card.Content>
+                        </Card.Content>*/}
                         <Card.Content style={{padding:'5px'}}>
                             <Feed>
                                 {previousConsultation && previousConsultation.length > 0 &&
@@ -877,7 +779,7 @@ const Widget = (props) => {
                                                 id="panel2a-header"
                                                 style={{padding:'0px 0px 0px 10px',backgroundColor:'#1678c2',border:'2px solid #ddd',color:'#fff'}}
                                             >
-                                                <Typography className={classes.heading} >Consultation -Date - {consultation.encounterDate}</Typography>
+                                                <Typography className={classes.heading} >Notes - {consultation.encounterDate}</Typography>
                                             </AccordionSummary>
                                             <AccordionDetails style={{padding:'10px 5px',minHeight:100,border:'2px solid #ddd', marginTop:'-10px',fontFamily:'Trebuchet'}}>
                                                 {consultation.visitNotes}

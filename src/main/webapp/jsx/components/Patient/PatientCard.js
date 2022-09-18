@@ -150,7 +150,7 @@ function PatientCard(props) {
                             <Col md={4} style={{marginTop:"10px"}}>
                                     <span>
                                         {" "}
-                                        Gender :{" "}
+                                        Sex :{" "}
                                         <b style={{color:'#0B72AA'}}>{patientObj.sex}</b>
                                     </span>
 
