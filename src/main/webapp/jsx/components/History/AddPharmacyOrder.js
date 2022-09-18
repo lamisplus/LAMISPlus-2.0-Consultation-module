@@ -45,7 +45,10 @@ const useStyles = makeStyles(theme => ({
         }
     },
     input: {
-        display: 'none'
+        border:'2px solid #014d88',
+        borderRadius:'0px',
+        fontSize:'16px',
+        color:'#000'
     },
     error: {
         color: "#f85032",
@@ -55,7 +58,19 @@ const useStyles = makeStyles(theme => ({
         color: "#4BB543 ",
         fontSize: "11px",
     },
-}));
+    inputGroupText:{
+        backgroundColor:'#014d88',
+        fontWeight:"bolder",
+        color:'#fff',
+        borderRadius:'0px'
+    },
+    label:{
+        fontSize:'16px',
+        color:'rgb(153, 46, 98)',
+        fontWeight:'600'
+    }
+}))
+
 
 const AddPharmacyOrder = (props) => {
     const patientObj = props.patientObj;
@@ -189,12 +204,13 @@ const AddPharmacyOrder = (props) => {
                                 <div className="row">
                                     <div className="form-group  mb-3">
                                         <FormGroup>
-                                            <Label>Encounter Date</Label>
+                                            <Label className={classes.label}>Encounter Date</Label>
                                             <InputGroup>
                                                 <Input
                                                     type="date"
                                                     name="encounterDateTime"
                                                     id="encounterDateTime"
+                                                    className={classes.input}
                                                     onChange={handleInputChangePharmacyOrderDto}
                                                     value={pharmacyOrder.encounterDateTime}
                                                 />
@@ -207,9 +223,10 @@ const AddPharmacyOrder = (props) => {
                                 <div className="row">
                                     <div className="form-group mb-3 col-md-4">
                                         <FormGroup>
-                                            <Label>Select Drugs</Label>
+                                            <Label className={classes.label}>Select Drugs</Label>
                                             <InputGroup>
                                                 <Input
+                                                    className={classes.input}
                                                     type="select"
                                                     name="drugName"
                                                     id="drugName"
@@ -225,9 +242,10 @@ const AddPharmacyOrder = (props) => {
 
                                     <div className="form-group mb-3 col-md-4">
                                         <FormGroup>
-                                            <Label>Dosage Strength</Label>
+                                            <Label className={classes.label}>Dosage Strength</Label>
                                             <InputGroup>
                                                 <Input
+                                                    className={classes.input}
                                                     type="text"
                                                     name="dosageStrength"
                                                     id="dosageStrength"
@@ -240,9 +258,10 @@ const AddPharmacyOrder = (props) => {
                                     </div>
                                     <div className="form-group mb-3 col-md-4">
                                         <FormGroup>
-                                            <Label>Dosage Unit</Label>
+                                            <Label className={classes.label}>Dosage Unit</Label>
                                             <InputGroup>
                                                 <Input
+                                                    className={classes.input}
                                                     type="select"
                                                     name="dosageStrengthUnit"
                                                     id="dosageStrengthUnit"
@@ -260,9 +279,10 @@ const AddPharmacyOrder = (props) => {
                                 <div className="row">
                                     <div className="form-group mb-3">
                                         <FormGroup>
-                                            <Label>Drug Brand Name</Label>
+                                            <Label className={classes.label}>Drug Brand Name</Label>
                                             <InputGroup>
                                                 <Input
+                                                    className={classes.input}
                                                     type="text"
                                                     name="brand"
                                                     id="brand"
@@ -278,9 +298,10 @@ const AddPharmacyOrder = (props) => {
                                 <div className="row">
                                     <div className="form-group mb-3 col-md-6">
                                         <FormGroup>
-                                            <Label>Dose Frequency</Label>
+                                            <Label className={classes.label}>Dose Frequency</Label>
                                             <InputGroup>
                                                 <Input
+                                                    className={classes.input}
                                                     type="text"
                                                     name="dosageFrequency"
                                                     id="dosageFrequency"
@@ -293,9 +314,10 @@ const AddPharmacyOrder = (props) => {
                                     </div>
                                     <div className="form-group mb-3 col-md-6">
                                         <FormGroup>
-                                            <Label>Start Date</Label>
+                                            <Label className={classes.label}>Start Date</Label>
                                             <InputGroup>
                                                 <Input
+                                                    className={classes.input}
                                                     type="date"
                                                     name="startDate"
                                                     id="startDate"
@@ -307,9 +329,10 @@ const AddPharmacyOrder = (props) => {
                                     </div>
                                     <div className="form-group mb-3 col-md-6">
                                         <FormGroup>
-                                            <Label>Duration</Label>
+                                            <Label className={classes.label}>Duration</Label>
                                             <InputGroup>
                                                 <Input
+                                                    className={classes.input}
                                                     type="text"
                                                     name="duration"
                                                     id="duration"
@@ -323,9 +346,10 @@ const AddPharmacyOrder = (props) => {
 
                                     <div className="form-group mb-3 col-md-6">
                                         <FormGroup>
-                                            <Label>Duration Unit</Label>
+                                            <Label className={classes.label}>Duration Unit</Label>
                                             <InputGroup>
                                                 <Input
+                                                    className={classes.input}
                                                     type="select"
                                                     name="durationUnit"
                                                     id="durationUnit"
@@ -343,9 +367,10 @@ const AddPharmacyOrder = (props) => {
                                 <div className="row">
                                     <div className="form-group mb-3">
                                         <FormGroup>
-                                            <Label>Other Instructions</Label>
+                                            <Label className={classes.label}>Other Instructions</Label>
                                             <InputGroup>
                                                 <Input
+                                                    className={classes.input}
                                                     type="textarea"
                                                     name="comments"
                                                     id="comments"
