@@ -107,6 +107,7 @@ const PatientConsultationHistory = (props) => {
     const [patientList, setPatientList] = useState([]);
     const patientObj = history.location && history.location.state ? history.location.state.patientObj : {};
     const[selectedVisit,setSelectedVisit] = useState();
+    const [labTestOrders, setLabTestOrders] = useState([]);
 
     ///GET LIST OF Patients
     const patientConsultations = useCallback(async () => {
@@ -124,8 +125,27 @@ const PatientConsultationHistory = (props) => {
 
     }, []);
 
+    const getPatientLaborders = useCallback(async () => {
+        try {
+            const response = await axios.get(`${baseUrl}laboratory/orders/visits/${patientObj.id}`,
+                        { headers: {"Authorization" : `Bearer ${token}`}});
+
+            console.log('lab order', response.data)
+            if (response.data.length > 0) {
+                setLabTestOrders(response.data);
+            }
+
+        } catch (e) {
+            toast.error("An error occured while fetching consultation !", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+        }
+
+    }, []);
+
     useEffect(() => {
         patientConsultations()
+        getPatientLaborders()
     }, [patientConsultations]);
 
     const formatDiagnosis = diagnosisList => {
@@ -253,7 +273,7 @@ const PatientConsultationHistory = (props) => {
                             {selectedVisit &&
                                 <Card >
                                     <CardContent style={{width:'100%',padding:'5px'}}>
-                                        <PatientConsultationHistoryCard visit={selectedVisit} />
+                                        <PatientConsultationHistoryCard visit={selectedVisit} testOrders={labTestOrders}/>
                                     </CardContent>
                                 </Card>
                             }

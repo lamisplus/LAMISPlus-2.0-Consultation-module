@@ -141,13 +141,13 @@ const Widget = (props) => {
             };
 
             const labOrder = {
-                  "orderDate": format(new Date(data.encounterDate.toString()), 'yyyy-MM-dd'),
-                  "orderTime": new Date().toLocaleTimeString('en-US',{hour12: false}),
+                  "orderDate": format(new Date(data.encounterDate.toString()), 'yyyy-MM-dd') + " " + new Date().toLocaleTimeString('en-US',{hour12: false}),
+                  //"orderTime": new Date().toLocaleTimeString('en-US',{hour12: false}),
                   "patientId": patientObj.id,
                   "tests": labTests,
                   "visitId": patientObj.visitId
             }
-            //console.log('labOrder', labOrder)
+            console.log('labOrder', labOrder)
             await axios.post(`${baseUrl}consultations`, InData,
             { headers: {"Authorization" : `Bearer ${token}`} }).then(( resp ) =>{
                 console.log("diagnosis saved", resp)
@@ -518,7 +518,7 @@ const Widget = (props) => {
                                 control={control}
                                 rules={{ required: true }}
                                 render={({ field: { ref, ...rest }}) => (
-                                    <textarea  style={{ minHeight: 300,border:'1px solid #014d88' }} className="form-control" {...rest} ></textarea>
+                                    <textarea  style={{ minHeight: 300,border:'1px solid #014d88', fontSize:'16px' }} className="form-control" {...rest} ></textarea>
                                 )}
                             />
                         </div>

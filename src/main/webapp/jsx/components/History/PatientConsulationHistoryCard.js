@@ -5,7 +5,8 @@ import Paper from "@mui/material/Paper";
 import Divider from "@mui/material/Divider";
 import {Button, Icon, Input, List, Table} from "semantic-ui-react";
 
-function PatientConsultationHistoryCard({visit}) {
+function PatientConsultationHistoryCard({visit, testOrders}) {
+    console.log("cv", visit)
     return (
         <div>
             <Paper elevation={1} style={{maxHeight: 250, overflow: 'auto',padding:'10px', backgroundColor:'#039be5'}}>
@@ -16,7 +17,7 @@ function PatientConsultationHistoryCard({visit}) {
             <Divider />
             <Paper elevation={1} style={{minHeight:200, maxHeight: 350, scrollbarWidth:'10', overflow: 'auto',border:'1px solid #A5E2FF', marginTop:'5px'}}>
                 <div style={{border:'10px solid #fff'}}>
-                    <Typography variant="body1" style={{fontFamily:'Trebuchet'}}>
+                    <Typography variant="body1" style={{fontFamily:'Trebuchet', fontSize:'18px' }}>
                         {visit.visitNotes}
                     </Typography>
                 </div>
@@ -82,10 +83,10 @@ function PatientConsultationHistoryCard({visit}) {
                                             {diagnosis.diagnosis}
                                         </Table.Cell>
                                         <Table.Cell>
-                                            {diagnosis.order}
+                                            {diagnosis.diagnosisOrder === 1 ? "Primary" : "Secondary"}
                                         </Table.Cell>
                                         <Table.Cell>
-                                            {diagnosis.certainty}
+                                            {diagnosis.certainty === 1 ? "Presumed" : "Confirmed"}
                                         </Table.Cell>
                                     </Table.Row>
                                 </Fragment>
@@ -105,27 +106,31 @@ function PatientConsultationHistoryCard({visit}) {
                             <Table.Row>
                                 <Table.Cell style={{ fontWeight: 'bold'}}>Condition</Table.Cell>
                                 <Table.Cell style={{ fontWeight: 'bold'}}>Order</Table.Cell>
-                                <Table.Cell style={{ fontWeight: 'bold'}}>Certainty</Table.Cell>
+                                <Table.Cell style={{ fontWeight: 'bold'}}>Priority</Table.Cell>
                                 <Table.Cell style={{ fontWeight: 'bold'}}></Table.Cell>
                             </Table.Row>
                         </Table.Header>
 
                         <Table.Body>
-                            {visit.diagnosisList.map((diagnosis, index) => (
-                                <Fragment key={`${diagnosis.id}~${index}`}>
-                                    <Table.Row>
-                                        <Table.Cell>
-                                            {diagnosis.diagnosis}
-                                        </Table.Cell>
-                                        <Table.Cell>
-                                            {diagnosis.order}
-                                        </Table.Cell>
-                                        <Table.Cell>
-                                            {diagnosis.certainty}
-                                        </Table.Cell>
-                                    </Table.Row>
-                                </Fragment>
-                            ))}
+                            {testOrders.map((x) => (
+
+                                x.labOrder.tests && x.labOrder.tests.map((diagnosis, index) => (
+                                    <Fragment key={`${diagnosis.id}~${index}`}>
+                                        <Table.Row>
+                                            <Table.Cell>
+                                                {diagnosis.labTestName}
+                                            </Table.Cell>
+                                            <Table.Cell>
+                                                {diagnosis.orderDate}
+                                            </Table.Cell>
+                                            <Table.Cell>
+                                                {diagnosis.orderPriorityName}
+                                            </Table.Cell>
+                                        </Table.Row>
+                                    </Fragment>
+                                ))
+                                ))
+                            }
                         </Table.Body>
                     </Table>
                 </div>
