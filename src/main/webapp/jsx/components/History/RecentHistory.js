@@ -13,8 +13,26 @@ import { Link, useHistory } from 'react-router-dom';
 import ButtonMui from "@material-ui/core/Button";
 import AddPharmacyOrder from './AddPharmacyOrder';
 import EditPharmacyOrder from './EditPharmacyOrder';
+import { makeStyles } from '@material-ui/core/styles';
+import { Accordion,AccordionSummary,AccordionDetails } from '@material-ui/core'
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import _ from "lodash";
+import VitalsCard from "../Consultation/VitalsCard";
+
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+        width: '100%',
+    },
+    heading: {
+        fontSize: theme.typography.pxToRem(15),
+        fontWeight: 'bolder',
+    },
+}));
 
 const Widget = (props) => {
+    const classes = useStyles();
     const patientObj = props.patientObj ? props.patientObj : {}
     //console.log("po", patientObj)
     const [isLabEnabled, setIsLabEnabled] = useState(false);
@@ -22,7 +40,7 @@ const Widget = (props) => {
     const [hasAllergies, setHasAllergies] = useState(false);
     const [pharmacyModal, setPharmacyModal] = useState(false);
     const [pharmacyOrderModal, setPharmacyOrderModal] = useState(false);
-    const [latestVitals, setLatestVitals] = useState([]);
+    const [otherVisitsVitals, setOtherVisitVitals] = useState([]);
     const [previousConsultation, setPreviousConsultation] = useState([]);
     const [encounterDate, setEncounterDate] = useState(new Date());
     const { handleSubmit, control, getValues, setError, setValue } = useForm();
@@ -63,11 +81,11 @@ const Widget = (props) => {
                 const response = await axios.get(`${apiUrl}drug-orders/visits/${patientObj.visitId}`,
                 { headers: {"Authorization" : `Bearer ${token}`}});
 
-                console.log("red",response.data)
 
                 if (typeof response.data === 'string') {
                     setPharmacyOrder([]);
                 }else {
+                    console.log("red",response.data)
                     setPharmacyOrder(response.data);
                 }
 
@@ -124,13 +142,13 @@ const Widget = (props) => {
             };
 
             const labOrder = {
-                  "orderDate": format(new Date(data.encounterDate.toString()), 'yyyy-MM-dd'),
-                  "orderTime": new Date().toLocaleTimeString('en-US',{hour12: false}),
+                  "orderDate": format(new Date(data.encounterDate.toString()), 'yyyy-MM-dd') + " " + new Date().toLocaleTimeString('en-US',{hour12: false}),
+                  //"orderTime": new Date().toLocaleTimeString('en-US',{hour12: false}),
                   "patientId": patientObj.id,
                   "tests": labTests,
                   "visitId": patientObj.visitId
             }
-            //console.log('labOrder', labOrder)
+            console.log('labOrder', labOrder)
             await axios.post(`${baseUrl}consultations`, InData,
             { headers: {"Authorization" : `Bearer ${token}`} }).then(( resp ) =>{
                 console.log("diagnosis saved", resp)
@@ -191,10 +209,14 @@ const Widget = (props) => {
         }
     }, []);
 
-    const loadLatestVitals = useCallback(async () => {
+    const loadOtherVisitsVitals = useCallback(async () => {
         try {
             const response = await axios.get(`${baseUrl}patient/vital-sign/person/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`}});
-            setLatestVitals(response.data);
+            if(response.data.length > 0){
+                let otherVisits = _.remove(response.data,{visitId:patientObj.visitId})
+                setOtherVisitVitals(otherVisits);
+            }
+
         } catch (e) {
             toast.error("An error occurred while fetching vitals", {
                 position: toast.POSITION.TOP_RIGHT
@@ -204,8 +226,8 @@ const Widget = (props) => {
 
     const loadPreviousConsultation = useCallback(async () => {
         try {
-            //const response = await axios.get(`${baseUrl}consultations/consultations-by-patient-id/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`}});
-            setPreviousConsultation([]);
+            const response = await axios.get(`${baseUrl}consultations/consultations-by-patient-id/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`}});
+            setPreviousConsultation(response.data);
         } catch (e) {
             toast.error("An error occurred while fetching previous consultation", {
                 position: toast.POSITION.TOP_RIGHT
@@ -239,13 +261,28 @@ const Widget = (props) => {
     useEffect(() => {
         loadPharmacyCheck();
         loadLabCheck();
-        loadLatestVitals();
+        loadOtherVisitsVitals();
         loadPreviousConsultation();
         loadLabGroup();
         priority();
         pharmacy_by_visitId();
-    }, [loadPharmacyCheck, loadLabCheck, loadLatestVitals,
-    loadPreviousConsultation, loadLabGroup, priority, pharmacy_by_visitId]);
+        getLatestVitals();
+    }, []);
+
+    const [latestVitals, setVitalSignDto]= useState({})
+    ///GET LIST OF Patients
+    async function getLatestVitals() {
+        axios
+            .get(`${baseUrl}patient/vital-sign/visit/${patientObj.visitId}`,
+                { headers: {"Authorization" : `Bearer ${token}`} }
+            )
+            .then((response) => {
+                setVitalSignDto(response.data);
+            })
+            .catch((error) => {
+            });
+    }
+
 
     const handleAddFields = () => {
         const values = [...inputFields];
@@ -343,68 +380,18 @@ const Widget = (props) => {
 
     return (
         <Grid columns='equal'>
-            <Grid.Column>
-                { latestVitals && latestVitals.length > 0 &&
-                    <Segment>
-                        <Label as='a' color='blue' ribbon>
-                            Recent Vitals
-                        </Label>
-                        <br/>
-                        <List celled>
-                            <List.Item>Pulse <span className="float-end"><b>{latestVitals[latestVitals.length - 1].pulse}bpm</b></span></List.Item>
-                            <List.Item>Respiratory Rate <span className="float-end"><b>{latestVitals[latestVitals.length - 1].respiratoryRate}bpm</b></span></List.Item>
-                            <List.Item>Temperature <span className="float-end"><b>{latestVitals[latestVitals.length - 1].temperature}<sup>0</sup>C</b></span></List.Item>
-                            <List.Item>Blood Presure <span  className="float-end"><b>{latestVitals[latestVitals.length - 1].systolic}/{latestVitals[latestVitals.length - 1].diastolic}</b></span></List.Item>
-                            <List.Item>Height <span  className="float-end"><b>{latestVitals[latestVitals.length - 1].height}m</b></span></List.Item>
-                            <List.Item>Weight <span  className="float-end"><b>{latestVitals[latestVitals.length - 1].bodyWeight}kg</b></span></List.Item>
-                        </List>
-                    </Segment>
-                }
-
-                { previousConsultation &&
-                    <Segment>
-                        <Label as='a' color='black' ribbon>
-                            Conditions
-                        </Label>
-                        <br/>
-
-                        { previousConsultation.map((consultation, i) => (
-                            <div>
-                                {consultation.diagnosisList.map((diagnosis, j)=> (
-                                    <Label as='a'  color='white'  size="mini" pointing>
-                                        {diagnosis.diagnosis}
-                                    </Label>
-                                ))}
-                            </div>
-                        ))}
-                    </Segment>
-                }
-
-                { hasAllergies &&
-                    <Segment>
-                        <Label as='a' color='red' ribbon>
-                            Allergies
-                        </Label>
-                        <br/><br/>
-
-                        <Label.Group color='blue'>
-                            <Label as='a'  size="mini">dust</Label>
-                            <Label as='a'  size="mini">smoke</Label>
-                        </Label.Group>
-                    </Segment>
-                }
-            </Grid.Column>
+            <VitalsCard props={props} />
 
             <Grid.Column width={9}>
                 <form onSubmit={handleSubmit(onSubmit, OnError)}>
-                    <Label as='a' color='black' ribbon>
+                    <Label as='a' color='black' style={{width:'100%',height:'35px',fontSize:'16px'}}>
                         <b>Physical Examination</b>
                     </Label>
 
                     <Segment>
-                        <div className="input-group input-group-sm mb-3">
-                            <span className="input-group-text">Encounter Date</span>
-                            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <div className="input-group input-group-sm mb-3" >
+                            <span className="input-group-text" style={{height:'40px',backgroundColor:'#014d88',color:'#fff', fontSize:'14px'}}>Encounter Dates</span>
+                            <MuiPickersUtilsProvider utils={DateFnsUtils} >
                                 <Controller
                                     name="encounterDate"
                                     control={control}
@@ -412,6 +399,7 @@ const Widget = (props) => {
                                     rules={{ required: true }}
                                     render={({ field: { ref, ...rest }}) => (
                                         <KeyboardDateTimePicker
+                                            style={{height:'40px', border:'1px solid #014d88'}}
                                             disableFuture
                                             format="dd/MM/yyyy hh:mm a"
                                             value={encounterDate}
@@ -426,21 +414,21 @@ const Widget = (props) => {
                         </div>
 
                         <div className="input-group input-group-sm " >
-                            <span className="input-group-text">Visit Note</span>
+                            <span className="input-group-text" style={{height:'300px',backgroundColor:'#014d88',color:'#fff', fontSize:'14px'}}>Visit Note</span>
                             <Controller
                                 name="visitNote"
                                 control={control}
                                 rules={{ required: true }}
                                 render={({ field: { ref, ...rest }}) => (
-                                    <textarea  style={{ minHeight: 100 }} className="form-control" {...rest} ></textarea>
+                                    <textarea  style={{ minHeight: 300,border:'1px solid #014d88', fontSize:'16px' }} className="form-control" {...rest} ></textarea>
                                 )}
                             />
                         </div>
                         <br/>
-                        <Label as='a' color='red' ribbon>
+                        <Label as='a'  style={{backgroundColor:'#014d88', color:'#fff',width:'100%',height:'35px',fontSize:'16px'}}>
                             Presenting Complaints
                         </Label>
-                        <Table color="red" celled>
+                        <Table style={{color:'#014d88',borderColor:'#014d88'}} celled >
                             <Table.Header>
                                 <Table.Row>
                                     <Table.Cell style={{ fontWeight: 'bold'}}>Complaints</Table.Cell>
@@ -478,7 +466,7 @@ const Widget = (props) => {
                                             </Table.Cell>
                                             <Table.Cell>
                                                 <select
-                                                    class="ui fluid selection dropdown"
+                                                    className="ui fluid selection dropdown"
                                                     value={inputField.severity}
                                                     onChange={event => handleInputChange(index, event)}
                                                     name="severity"
@@ -525,10 +513,10 @@ const Widget = (props) => {
                             </Table.Footer>
                         </Table>
                         <br/>
-                        <Label as='a' color='pink' ribbon>
+                        <Label as='a' style={{backgroundColor:'#992E62', color:'#fff', width:'100%',height:'35px',fontSize:'16px'}}>
                             Clinical Diagnosis
                         </Label>
-                        <Table color="pink" celled>
+                        <Table style={{color:'#992E62',borderColor:'#992E62'}} celled>
                             <Table.Header>
                                 <Table.Row>
                                     <Table.Cell style={{ fontWeight: 'bold'}}>Condition</Table.Cell>
@@ -587,7 +575,7 @@ const Widget = (props) => {
                                 <Table.Row>
                                     <Table.HeaderCell>
 
-                                        <Button color="blue" size="tiny" type="button" onClick={() => handleAddDiagFields()}>
+                                        <Button style={{backgroundColor:'#992E62',color:'#fff'}} size="tiny" type="button" onClick={() => handleAddDiagFields()}>
                                             <Icon name='plus' /> Add More
                                         </Button>
                                     </Table.HeaderCell>
@@ -597,7 +585,7 @@ const Widget = (props) => {
                         </Table>
                         <br/>
                         { isLabEnabled && <div>
-                            <Label as='a' color='teal' ribbon>
+                            <Label as='a' color='teal' style={{width:'100%',height:'35px',fontSize:'16px'}}>
                                 Lab Test
                             </Label>
 
@@ -678,11 +666,11 @@ const Widget = (props) => {
                                                         id="status">
                                                         <option>Select</option>
                                                         <option value="0">Pending Collection</option>
-                                                       {/* <option value="1">Sample Collected</option>
+                                                        {/*<option value="1">Sample Collected</option>
                                                         <option value="2">Sample Transferred</option>
                                                         <option value="3">Sample Verified</option>
                                                         <option value="4">Sample Rejected</option>
-                                                        <option value="5">Result Available</option> */}
+                                                        <option value="5">Result Available</option>*/}
                                                     </select>
                                                 </Table.Cell>
                                             </Table.Row>
@@ -704,7 +692,7 @@ const Widget = (props) => {
                             </Table>
                         </div>}
                         <br/>
-                        <Label as='a' color='purple' ribbon>
+                        <Label as='a' color='purple' style={{width:'100%',height:'35px',fontSize:'16px'}}>
                             Pharmacy Order
                         </Label>
                         <br/>
@@ -751,6 +739,7 @@ const Widget = (props) => {
           </Grid.Column>
           <Grid.Column>
             <Segment>
+
             <List>
                   <List.Item>
                       <Link
@@ -758,39 +747,47 @@ const Widget = (props) => {
                               pathname: "/patient-consultations-history",
                               state: { patientObj: patientObj  }
                           }}>
-                          <Button icon labelPosition='right' color='green' fluid>
+                          <Button icon labelPosition='right'  style={{width:'100%',backgroundColor:'#992E62',color:"#fff", padding:'15px'}}  fluid>
                               <Icon name='eye' />
-                              View History
+                              View Consultation History
                           </Button>
                       </Link>
                   </List.Item>
-                  <List.Item>
+{/*                  <List.Item>
                   <Button icon labelPosition='right' color='blue' fluid>
                       <Icon name='calendar alternate' />
-                        Appointment 
+                        Appointment
                     </Button>
-                  </List.Item>
+                  </List.Item>*/}
             </List>
                 { previousConsultation &&
-                    <Card>
-                        <Card.Content>
-                            <b>Previous Clinical Notes</b>
-                        </Card.Content>
-                        <Card.Content>
+                    <Card style={{width:'100%'}}>
+{/*                        <Card.Content style={{padding:'5px'}}>
+                            <Label as='a'   style={{width:'100%',backgroundColor:'#014d88',color:"#fff", padding:'10px'}}>
+                                <Typography className={classes.heading}><b>Previous Clinical Notes</b></Typography>
+                            </Label>
+
+                        </Card.Content>*/}
+                        <Card.Content style={{padding:'5px'}}>
                             <Feed>
-                                { previousConsultation.map((consultation, i) => (
-                                    <div>
-                                        <Feed.Event>
-                                            <Feed.Content>
-                                                <Feed.Date content={consultation.encounterDate} />
-                                                <Feed.Summary>
-                                                    {consultation.visitNotes}
-                                                </Feed.Summary>
-                                            </Feed.Content>
-                                        </Feed.Event>
-                                        <hr/>
-                                    </div>
-                                )) }
+                                {previousConsultation && previousConsultation.length > 0 &&
+                                    previousConsultation.map(consultation =>
+                                        <Accordion>
+                                            <AccordionSummary
+                                                expandIcon={<ExpandMoreIcon style={{color:'#fff'}} />}
+                                                aria-controls="panel2a-content"
+                                                id="panel2a-header"
+                                                style={{padding:'0px 0px 0px 10px',backgroundColor:'#1678c2',border:'2px solid #ddd',color:'#fff'}}
+                                            >
+                                                <Typography className={classes.heading} >Notes - {consultation.encounterDate}</Typography>
+                                            </AccordionSummary>
+                                            <AccordionDetails style={{padding:'10px 5px',minHeight:100,border:'2px solid #ddd', marginTop:'-10px',fontFamily:'Trebuchet'}}>
+                                                {consultation.visitNotes}
+                                            </AccordionDetails>
+                                        </Accordion>
+                                    )
+
+                                }
                             </Feed>
                         </Card.Content>
                     </Card>

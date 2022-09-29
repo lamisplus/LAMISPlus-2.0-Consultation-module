@@ -531,7 +531,7 @@ const Widget = (props) => {
                                 render={({ field: { ref, ...rest }}) => (
                                     <textarea
                                     className="form-control"
-                                    style={{ minHeight: 100, fontSize: 14 }}
+                                    style={{ minHeight: 300,border:'1px solid #014d88', fontSize:'16px' }}
                                     {...rest}
                                     >{patientObj.visitNotes}</textarea>
                                 )}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import MaterialTable from 'material-table';
+import MaterialTable from '@material-table/core';
 import axios from "axios";
 import { url as baseUrl, token } from "./../../../api";
 
@@ -29,7 +29,9 @@ import {Menu,MenuList,MenuButton,MenuItem,} from "@reach/menu-button";
 import "@reach/menu-button/styles.css";
 import moment from "moment";
 import {toast} from "react-toastify";
-
+import {MdDeleteForever, MdModeEdit, MdPerson} from "react-icons/md";
+import {FaEye, FaCaretDown } from "react-icons/fa";
+import SplitActionButton from "../../layouts/SplitActionButton";
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -139,6 +141,28 @@ const Patients = (props) => {
         return hospitalNumber ? hospitalNumber.value : '';
     };
 
+
+    function actionItems(row){
+        console.log(row);
+        console.log('try 11')
+        return  [
+            {
+                type:'single',
+                actions:[
+                    {
+                        name:'Dashboard',
+                        type:'link',
+                        icon:<FaEye  size="22"/>,
+                        to:{
+                            pathname: "/patient-history",
+                            state: { patientObj: row  }
+                        }
+                    }
+                ]
+            }
+
+        ]
+    }
     //console.log(patientList)
     return (
         <div>
@@ -162,9 +186,9 @@ const Patients = (props) => {
                         ]}
                         data={ patientList.map((row) => ({
 
-                            name:row.firstName + " " + row.surname,
-                            hospital_number: getHospitalNumber(row.identifier),
-                            gender:row.gender.display,
+                            name:row.firstName + " " + row.otherName,
+                            hospital_number: row.identifier.identifier[0].value,
+                            gender:row.sex,
                             age: (row.dateOfBirth === 0 ||
                                 row.dateOfBirth === undefined ||
                                 row.dateOfBirth === null ||
@@ -172,35 +196,17 @@ const Patients = (props) => {
                                 ? 0
                                 : calculate_age(moment(row.dateOfBirth).format("DD-MM-YYYY")),
 
-                            actions:
-
-                                <div>
-                                    <Menu>
-                                        <MenuButton style={{ backgroundColor:"#3F51B5", color:"#fff", border:"2px solid #3F51B5", borderRadius:"4px", }}>
-                                            Actions <span aria-hidden>▾</span>
-                                        </MenuButton>
-                                        <MenuList style={{ color:"#000000 !important"}} >
-
-                                            <MenuItem style={{ color:"#000 !important"}}>
-                                                <Link
-                                                    to={{
-                                                        pathname: "/patient-history",
-                                                        state: { patientObj: row  }
-                                                    }}>
-                                                    <MdDashboard size="15" color="black" />{" "}<span style={{color: '#000'}}>Patient Dashboard</span>
-                                                </Link>
-                                            </MenuItem>
-
-                                        </MenuList>
-                                    </Menu>
-                                </div>
+                               actions:<SplitActionButton actions={actionItems(row)} />
 
                         }))}
 
                         options={{
                             headerStyle: {
-                                //backgroundColor: "#9F9FA5",
-                                color: "#000",
+                                backgroundColor: "#014d88",
+                                color: "#fff",
+                                fontSize:'16px',
+                                padding:'10px',
+                                fontWeight:'bolder'
                             },
                             searchFieldStyle: {
                                 width : '200%',

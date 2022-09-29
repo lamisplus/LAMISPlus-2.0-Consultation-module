@@ -16,7 +16,7 @@ CREATE TABLE public.consultation
 	date_modified TIMESTAMP,
     PRIMARY KEY (id)
 );
-ALTER TABLE IF EXISTS public.consultation OWNER to postgres;	
+
 ALTER SEQUENCE consultation_id_seq OWNED BY consultation.id;
 
 
@@ -38,7 +38,6 @@ CREATE TABLE public.consultation_complaint
 	date_modified TIMESTAMP,
     PRIMARY KEY (id)
 );
-ALTER TABLE IF EXISTS public.consultation_complaint OWNER to postgres;	
 ALTER SEQUENCE consultation_complaint_id_seq OWNED BY consultation_complaint.id;
 
 
@@ -59,7 +58,7 @@ CREATE TABLE public.consultation_diagnosis
 	date_modified TIMESTAMP,
     PRIMARY KEY (id)
 );
-ALTER TABLE IF EXISTS public.consultation_diagnosis OWNER to postgres;	
+
 ALTER SEQUENCE consultation_diagnosis_id_seq OWNED BY consultation_diagnosis.id;
 
 delete from base_application_codeset where codeset_group='COMPLAINT_SEVERITY';

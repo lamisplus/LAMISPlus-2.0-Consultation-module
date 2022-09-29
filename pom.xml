@@ -281,7 +281,7 @@
 										<goal>npm</goal>
 									</goals>
 									<configuration>
-										<arguments>install</arguments>
+										<arguments>install --legacy-peer-deps</arguments>
 									</configuration>
 								</execution>
 								<execution>
@@ -315,4 +315,6 @@
 			</plugin>
 		</plugins>
 	</build>
+
+
 </project>
