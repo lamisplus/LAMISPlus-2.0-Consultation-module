@@ -107,7 +107,6 @@ const PatientConsultationHistory = (props) => {
     const [patientList, setPatientList] = useState([]);
     const patientObj = history.location && history.location.state ? history.location.state.patientObj : {};
     const[selectedVisit,setSelectedVisit] = useState();
-    const [labTestOrders, setLabTestOrders] = useState([]);
 
     ///GET LIST OF Patients
     const patientConsultations = useCallback(async () => {
@@ -125,28 +124,9 @@ const PatientConsultationHistory = (props) => {
 
     }, []);
 
-    const getPatientLaborders = useCallback(async () => {
-        try {
-            const response = await axios.get(`${baseUrl}laboratory/orders/visits/${patientObj.id}`,
-                        { headers: {"Authorization" : `Bearer ${token}`}});
-
-            console.log('lab order', response.data)
-            if (response.data.length > 0) {
-                setLabTestOrders(response.data);
-            }
-
-        } catch (e) {
-            toast.error("An error occured while fetching consultation !", {
-                position: toast.POSITION.TOP_RIGHT
-            });
-        }
-
-    }, []);
-
     useEffect(() => {
         patientConsultations()
-        getPatientLaborders()
-    }, [patientConsultations]);
+    }, []);
 
     const formatDiagnosis = diagnosisList => {
         return diagnosisList.map(obj => obj.diagnosis) + " ,";
@@ -220,31 +200,9 @@ const PatientConsultationHistory = (props) => {
                                                 style={{width:'100%',border:'1px dotted #eee'}}
                                                 onClick={()=>loadConsultationDetails(row)}
                                             >
-                                                <span style={{padding:'10px 0px', fontSize:'16px', color: '#014d88', fontWeight:'bolder',float:'left'}}>{row.encounterDate} -- Status --- (Closed)</span>
+                                                <span style={{padding:'10px 0px', fontSize:'16px', color: '#014d88', fontWeight:'bolder',float:'left'}}>{row.encounterDate}</span>
                                             </Button>
                                         </div>
-                                    /*                                        date:row.encounterDate,
-                                                                            visitNotes:row.visitNotes,
-                                                                            diagnosisList:formatDiagnosis(row.diagnosisList),
-                                                                            presentingComplaints:formatPresentingComplaints(row.presentingComplaints),
-                                                                            actions:
-                                                                                <div>
-                                                                                    <Link
-                                                                                        to={{
-                                                                                            pathname: "/patient-consultation",
-                                                                                            state: { patientObj: row  }
-                                                                                        }}>
-                                                                                        <Button
-                                                                                            icon
-                                                                                            inverted
-                                                                                            color='blue'
-                                                                                            className=" float-end ms-2"
-                                                                                        >
-                                                                                            <Icon name='eye' />
-                                                                                        </Button>
-                                                                                    </Link>
-                                                                                </div>*/
-
                                 }))}
 
                                 options={{
@@ -273,7 +231,7 @@ const PatientConsultationHistory = (props) => {
                             {selectedVisit &&
                                 <Card >
                                     <CardContent style={{width:'100%',padding:'5px'}}>
-                                        <PatientConsultationHistoryCard visit={selectedVisit} testOrders={labTestOrders}/>
+                                        <PatientConsultationHistoryCard visit={selectedVisit} />
                                     </CardContent>
                                 </Card>
                             }
