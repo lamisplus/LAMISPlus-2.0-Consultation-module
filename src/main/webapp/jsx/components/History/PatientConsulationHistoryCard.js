@@ -7,7 +7,7 @@ import {Button, Icon, Input, List, Table} from "semantic-ui-react";
 import moment from "moment";
 
 function PatientConsultationHistoryCard({visit, testOrders}) {
-    console.log("cv", visit)
+
     return (
         <div>
             <Paper elevation={1} style={{maxHeight: 250, overflow: 'auto',padding:'10px', backgroundColor:'#039be5'}}>
@@ -97,9 +97,9 @@ function PatientConsultationHistoryCard({visit, testOrders}) {
                 </div>
             </Paper>
 
-{/*
 
-            <h3 style={{marginTop:'20px',color:'teal'}}>Laboratory Test</h3>
+
+            <h3 style={{marginTop:'20px',color:'teal'}}>Laboratory Tests</h3>
             <Divider />
             <Paper elevation={1} style={{minHeight:100,border:'5px solid #f7f7f7', marginTop:'5px'}}>
                 <div style={{border:'5px solid #fff'}}>
@@ -138,7 +138,7 @@ function PatientConsultationHistoryCard({visit, testOrders}) {
                 </div>
             </Paper>
 
-
+            {/*
             <h3 style={{marginTop:'20px',color:'purple '}}>Pharmacy Order</h3>
             <Divider />
             <Paper elevation={1} style={{minHeight:100,border:'5px solid #f7f7f7', marginTop:'5px'}}>

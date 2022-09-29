@@ -107,6 +107,7 @@ const PatientConsultationHistory = (props) => {
     const [patientList, setPatientList] = useState([]);
     const patientObj = history.location && history.location.state ? history.location.state.patientObj : {};
     const[selectedVisit,setSelectedVisit] = useState();
+    const[labTests,setLabTests] = useState([]);
 
     ///GET LIST OF Patients
     const patientConsultations = useCallback(async () => {
@@ -124,8 +125,26 @@ const PatientConsultationHistory = (props) => {
 
     }, []);
 
+
+    const loadPatientTests = useCallback(async () => {
+         try {
+             const response = await axios.get(`${baseUrl}laboratory/orders/visits/${patientObj.id}`,
+                         { headers: {"Authorization" : `Bearer ${token}`}});
+
+             if(response.data.length > 0 ){
+                 setLabTests(response.data);
+             }
+         } catch (e) {
+             toast.error("An error occured while fetching consultation !", {
+                 position: toast.POSITION.TOP_RIGHT
+             });
+         }
+
+     }, []);
+
     useEffect(() => {
         patientConsultations()
+        loadPatientTests()
     }, []);
 
     const formatDiagnosis = diagnosisList => {
@@ -136,7 +155,7 @@ const PatientConsultationHistory = (props) => {
     };
     const loadConsultationDetails = (row)=>{
         setSelectedVisit(row);
-        console.log(row);
+        //console.log(row);
     }
     return (
         <Container style={{width:'100%'}}>
@@ -231,7 +250,7 @@ const PatientConsultationHistory = (props) => {
                             {selectedVisit &&
                                 <Card >
                                     <CardContent style={{width:'100%',padding:'5px'}}>
-                                        <PatientConsultationHistoryCard visit={selectedVisit} />
+                                        <PatientConsultationHistoryCard visit={selectedVisit} testOrders={labTests}/>
                                     </CardContent>
                                 </Card>
                             }
